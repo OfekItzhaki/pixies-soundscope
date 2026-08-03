@@ -15,9 +15,9 @@ const themeOptions: Array<{ label: string; value: ThemePreference }> = [
 
 export function ThemeToggle({ preference, onPreferenceChange }: ThemeToggleProps): ReactElement {
   return (
-    <fieldset className="theme-toggle" aria-label="Theme mode">
-      <legend>Theme</legend>
-      <div className="theme-toggle-options">
+    <section className="theme-toggle" aria-labelledby="theme-toggle-heading">
+      <h2 id="theme-toggle-heading">Theme</h2>
+      <div className="theme-toggle-options" role="group" aria-label="Theme mode">
         {themeOptions.map((option) => (
           <button
             key={option.value}
@@ -30,6 +30,6 @@ export function ThemeToggle({ preference, onPreferenceChange }: ThemeToggleProps
           </button>
         ))}
       </div>
-    </fieldset>
+    </section>
   );
 }

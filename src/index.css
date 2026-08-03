@@ -131,10 +131,6 @@ input:focus-visible {
 }
 
 .app-header {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 18rem;
-  gap: 1.75rem;
-  align-items: start;
   margin-bottom: 2.5rem;
 }
 
@@ -180,18 +176,6 @@ input:focus-visible {
   width: 100%;
   min-width: 0;
   margin: 0;
-  padding: 1.4rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-panel);
-  background: var(--color-surface-alpha);
-  box-shadow: var(--shadow-panel);
-}
-
-.theme-toggle legend {
-  margin-bottom: 0.4rem;
-  color: var(--color-ink);
-  font-size: 0.85rem;
-  font-weight: 700;
 }
 
 .theme-toggle-options {
@@ -226,7 +210,13 @@ input:focus-visible {
   align-items: start;
 }
 
+.side-rail {
+  display: grid;
+  gap: 1.25rem;
+}
+
 .search-panel,
+.theme-toggle,
 .recent-searches {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-panel);
@@ -236,6 +226,7 @@ input:focus-visible {
 }
 
 .search-panel h2,
+.theme-toggle h2,
 .recent-searches h2,
 .results-section h2 {
   margin: 0 0 1rem;

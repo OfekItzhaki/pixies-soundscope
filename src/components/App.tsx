@@ -52,12 +52,14 @@ export function App(): ReactElement {
             <h1>SoundScope</h1>
             <p className="app-subtitle">Search Mixcloud tracks and keep your recent discoveries close.</p>
           </div>
-          <ThemeToggle preference={themePreference} onPreferenceChange={updateThemePreference} />
         </header>
 
         <div className="app-layout">
           <SearchContainer />
-          <RecentSearchesContainer />
+          <aside className="side-rail" aria-label="Preferences and recent searches">
+            <ThemeToggle preference={themePreference} onPreferenceChange={updateThemePreference} />
+            <RecentSearchesContainer />
+          </aside>
         </div>
       </main>
     </SearchStateProvider>
