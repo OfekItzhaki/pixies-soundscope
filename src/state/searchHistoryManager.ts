@@ -1,0 +1,47 @@
+export interface SearchHistoryStorage {
+  read(): string[];
+  write(history: string[]): void;
+}
+
+export const MAX_RECENT_SEARCHES = 5;
+
+export function loadHistory(storage: SearchHistoryStorage): string[] {
+  return sanitizeHistory(storage.read());
+}
+
+export function saveHistory(storage: SearchHistoryStorage, history: string[]): void {
+  storage.write(sanitizeHistory(history));
+}
+
+export function updateHistory(history: string[], newTerm: string): string[] {
+  const normalizedTerm = normalizeSearchTerm(newTerm);
+
+  if (!normalizedTerm) {
+    return sanitizeHistory(history);
+  }
+
+  const remainingTerms = sanitizeHistory(history).filter(
+    (term) => term.toLocaleLowerCase() !== normalizedTerm.toLocaleLowerCase(),
+  );
+
+  return [normalizedTerm, ...remainingTerms].slice(0, MAX_RECENT_SEARCHES);
+}
+
+function sanitizeHistory(history: string[]): string[] {
+  return history.reduce<string[]>((uniqueTerms, term) => {
+    const normalizedTerm = normalizeSearchTerm(term);
+    const termExists = uniqueTerms.some(
+      (existingTerm) => existingTerm.toLocaleLowerCase() === normalizedTerm.toLocaleLowerCase(),
+    );
+
+    if (!normalizedTerm || termExists) {
+      return uniqueTerms;
+    }
+
+    return [...uniqueTerms, normalizedTerm].slice(0, MAX_RECENT_SEARCHES);
+  }, []);
+}
+
+function normalizeSearchTerm(term: string): string {
+  return term.trim().replace(/\s+/g, ' ');
+}
