@@ -115,14 +115,16 @@ interface MixcloudPlayerProps {
 
 function MixcloudPlayer({ track, embedUrl }: MixcloudPlayerProps): ReactElement {
   return (
-    <iframe
-      className="track-player"
-      title={`Mixcloud player for ${track.title}`}
-      src={embedUrl}
-      allow="autoplay; encrypted-media"
-      loading="lazy"
-      aria-label={`Mixcloud embedded player for ${track.title}`}
-    />
+    <div className="track-player-frame">
+      <iframe
+        className="track-player"
+        title={`Mixcloud player for ${track.title}`}
+        src={embedUrl}
+        allow="autoplay; encrypted-media"
+        loading="lazy"
+        aria-label={`Mixcloud embedded player for ${track.title}`}
+      />
+    </div>
   );
 }
 
