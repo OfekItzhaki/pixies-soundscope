@@ -17,7 +17,7 @@ export function RecentSearchesContainer(): ReactElement {
                 aria-label={`Search again for ${term}`}
                 onClick={() => {
                   actions.setQuery(term);
-                  void actions.performSearch(term);
+                  void actions.performSearch(term, { recordInHistory: true });
                 }}
               >
                 {term}

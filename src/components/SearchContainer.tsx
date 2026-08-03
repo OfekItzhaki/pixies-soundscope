@@ -10,6 +10,7 @@ import { ResultsGrid } from './ResultsGrid';
 import { ResultsList } from './ResultsList';
 
 const SEARCH_DEBOUNCE_MS = 300;
+const RECENT_SEARCH_STABILITY_MS = 5000;
 
 export function SearchContainer(): ReactElement {
   const { state, actions } = useSearchState();
@@ -30,21 +31,33 @@ export function SearchContainer(): ReactElement {
       }, SEARCH_DEBOUNCE_MS),
     [actions],
   );
+  const debouncedRecentSearch = useMemo(
+    () =>
+      debounce((query: string) => {
+        actions.recordRecentSearch(query);
+      }, RECENT_SEARCH_STABILITY_MS),
+    [actions],
+  );
 
   useEffect(() => {
-    return () => debouncedSearch.cancel();
-  }, [debouncedSearch]);
+    return () => {
+      debouncedSearch.cancel();
+      debouncedRecentSearch.cancel();
+    };
+  }, [debouncedRecentSearch, debouncedSearch]);
 
   const handleQueryChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const nextQuery = event.target.value;
     actions.setQuery(nextQuery);
     debouncedSearch(nextQuery);
+    debouncedRecentSearch(nextQuery);
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     debouncedSearch.cancel();
-    void actions.performSearch(state.query);
+    debouncedRecentSearch.cancel();
+    void actions.performSearch(state.query, { recordInHistory: true });
   };
 
   const handleSelectTrack = (track: Track, sourceElement: HTMLElement): void => {

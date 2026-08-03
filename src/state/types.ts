@@ -17,11 +17,16 @@ export interface SearchState {
 
 export interface SearchStateActions {
   setQuery(query: string): void;
-  performSearch(query: string): Promise<void>;
+  performSearch(query: string, options?: SearchRequestOptions): Promise<void>;
+  recordRecentSearch(query: string): void;
   goToNextPage(): Promise<void>;
   goToPreviousPage(): Promise<void>;
   selectTrack(track: Track): void;
   setViewMode(mode: ViewMode): void;
+}
+
+export interface SearchRequestOptions {
+  recordInHistory?: boolean;
 }
 
 export interface SearchStateContextValue {

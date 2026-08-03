@@ -19,7 +19,13 @@ import {
   type SearchHistoryStorage,
 } from './searchHistoryManager';
 import { SearchStateContext } from './searchStateContextValue';
-import type { SearchState, SearchStateActions, SearchStateContextValue, ViewMode } from './types';
+import type {
+  SearchRequestOptions,
+  SearchState,
+  SearchStateActions,
+  SearchStateContextValue,
+  ViewMode,
+} from './types';
 import { getStringItem, setStringItem, type KeyValueStorage } from '../utils/storage';
 
 const VIEW_MODE_STORAGE_KEY = 'pixies-soundscope:view-mode';
@@ -68,8 +74,23 @@ export function SearchStateProvider({
     };
   }, []);
 
+  const recordRecentSearch = useCallback(
+    (query: string): void => {
+      const normalizedQuery = query.trim();
+
+      if (!normalizedQuery) {
+        return;
+      }
+
+      const nextHistory = updateHistory(stateRef.current.recentSearches, normalizedQuery);
+      saveHistory(searchHistoryStorage, nextHistory);
+      dispatch({ type: 'set-recent-searches', recentSearches: nextHistory });
+    },
+    [searchHistoryStorage],
+  );
+
   const runSearch = useCallback(
-    async (query: string, cursor?: string): Promise<void> => {
+    async (query: string, cursor?: string, options?: SearchRequestOptions): Promise<void> => {
       const normalizedQuery = query.trim();
 
       if (!normalizedQuery) {
@@ -97,10 +118,8 @@ export function SearchStateProvider({
 
         dispatch({ type: 'search-success', response, preserveSelectedTrack: Boolean(cursor) });
 
-        if (!cursor) {
-          const nextHistory = updateHistory(stateRef.current.recentSearches, normalizedQuery);
-          saveHistory(searchHistoryStorage, nextHistory);
-          dispatch({ type: 'set-recent-searches', recentSearches: nextHistory });
+        if (!cursor && options?.recordInHistory) {
+          recordRecentSearch(normalizedQuery);
         }
       } catch (error) {
         if (abortController.signal.aborted || requestId !== requestIdRef.current) {
@@ -113,13 +132,15 @@ export function SearchStateProvider({
         });
       }
     },
-    [searchHistoryStorage, soundApiClient],
+    [recordRecentSearch, soundApiClient],
   );
 
   const actions = useMemo<SearchStateActions>(
     () => ({
       setQuery: (query: string): void => dispatch({ type: 'set-query', query }),
-      performSearch: (query: string): Promise<void> => runSearch(query),
+      performSearch: (query: string, options?: SearchRequestOptions): Promise<void> =>
+        runSearch(query, undefined, options),
+      recordRecentSearch,
       goToNextPage: (): Promise<void> => {
         const { query, nextCursor, prevCursor } = stateRef.current;
 
@@ -144,7 +165,7 @@ export function SearchStateProvider({
         dispatch({ type: 'set-view-mode', viewMode });
       },
     }),
-    [runSearch, viewModeStorage],
+    [recordRecentSearch, runSearch, viewModeStorage],
   );
 
   const contextValue = useMemo<SearchStateContextValue>(
