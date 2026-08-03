@@ -221,9 +221,9 @@ function searchStateReducer(state: SearchState, action: SearchStateAction): Sear
 }
 
 function loadViewMode(storage?: KeyValueStorage): ViewMode {
-  const storedViewMode = getStringItem(VIEW_MODE_STORAGE_KEY, 'list', storage);
+  const storedViewMode = getStringItem(VIEW_MODE_STORAGE_KEY, 'tile', storage);
 
-  return storedViewMode === 'tile' ? 'tile' : 'list';
+  return storedViewMode === 'list' ? 'list' : 'tile';
 }
 
 function getSearchErrorMessage(error: unknown): string {
