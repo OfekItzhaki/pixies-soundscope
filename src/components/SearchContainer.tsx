@@ -4,6 +4,7 @@ import type { ChangeEvent, FormEvent, ReactElement } from 'react';
 import type { Track } from '../api/types';
 import { useSearchState } from '../state/useSearchState';
 import { debounce } from '../utils/debounce';
+import { getStringItem, setStringItem } from '../utils/storage';
 import { ImageContainer, type SelectionAnimation } from './ImageContainer';
 import { PaginationControls } from './PaginationControls';
 import { ResultsGrid } from './ResultsGrid';
@@ -11,6 +12,7 @@ import { ResultsList } from './ResultsList';
 
 const SEARCH_DEBOUNCE_MS = 300;
 const RECENT_SEARCH_STABILITY_MS = 5000;
+const AUTOPLAY_SELECTION_STORAGE_KEY = 'pixies-soundscope:autoplay-selection';
 
 export function SearchContainer(): ReactElement {
   const { state, actions } = useSearchState();
@@ -19,6 +21,9 @@ export function SearchContainer(): ReactElement {
   const animationIdRef = useRef(0);
   const [selectionAnimation, setSelectionAnimation] = useState<SelectionAnimation | undefined>();
   const [visiblePlayerTrackId, setVisiblePlayerTrackId] = useState<string | undefined>();
+  const [autoplaySelection, setAutoplaySelection] = useState<boolean>(
+    () => getStringItem(AUTOPLAY_SELECTION_STORAGE_KEY, 'enabled') !== 'disabled',
+  );
   const hasCompletedEmptySearch =
     !state.loading &&
     !state.error &&
@@ -65,7 +70,7 @@ export function SearchContainer(): ReactElement {
 
     if (!targetElement) {
       actions.selectTrack(track);
-      setVisiblePlayerTrackId(track.id);
+      setVisiblePlayerTrackId(autoplaySelection ? track.id : undefined);
       return;
     }
 
@@ -76,6 +81,11 @@ export function SearchContainer(): ReactElement {
       from: sourceElement.getBoundingClientRect(),
       to: targetElement.getBoundingClientRect(),
     });
+  };
+
+  const handleAutoplaySelectionChange = (enabled: boolean): void => {
+    setAutoplaySelection(enabled);
+    setStringItem(AUTOPLAY_SELECTION_STORAGE_KEY, enabled ? 'enabled' : 'disabled');
   };
 
   return (
@@ -100,6 +110,14 @@ export function SearchContainer(): ReactElement {
             Go
           </button>
         </div>
+        <label className="autoplay-toggle">
+          <input
+            type="checkbox"
+            checked={autoplaySelection}
+            onChange={(event) => handleAutoplaySelectionChange(event.target.checked)}
+          />
+          <span>Autoplay selected tracks</span>
+        </label>
       </form>
 
       <div id="search-status" className="status-region" aria-live="polite" aria-atomic="true">
@@ -134,7 +152,7 @@ export function SearchContainer(): ReactElement {
         }
         onAnimationComplete={(track) => {
           actions.selectTrack(track);
-          setVisiblePlayerTrackId(track.id);
+          setVisiblePlayerTrackId(autoplaySelection ? track.id : undefined);
           setSelectionAnimation(undefined);
           window.requestAnimationFrame(() => selectedTrackButtonRef.current?.focus());
         }}

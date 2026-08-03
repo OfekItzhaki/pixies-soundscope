@@ -69,10 +69,10 @@ Then open `http://localhost:4173`.
 
 - Searches Mixcloud cloudcasts through the data layer.
 - Displays results 6 at a time using Mixcloud cursor URLs for Next and Previous pagination.
-- Stores the last 5 recent searches in `localStorage`, de-duplicated and ordered by recency.
+- Stores the last 5 recent searches in `localStorage`, de-duplicated and ordered by recency. Typed searches are recorded after the input stays unchanged for 5 seconds, while Go/Enter records immediately.
 - Supports list and tile result views, with the selected view persisted across visits.
 - Shows a central selected-track image with a simple result-to-image animation.
-- Embeds the selected track with the Mixcloud iframe widget after the user clicks the central image.
+- Embeds the selected track with the Mixcloud iframe widget. Selected tracks autoplay by default, and the autoplay preference is persisted across visits.
 - Handles debounced search input, in-flight request cancellation, stale-response protection, loading, empty, and error states.
 - Provides keyboard-friendly controls, semantic regions, ARIA labels, live status messages, and focus management after selection.
 - Includes Vitest unit tests for core search history and pagination logic.
