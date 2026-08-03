@@ -349,12 +349,12 @@ input:focus-visible {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 0.62rem;
-  height: 0.62rem;
+  width: 0.48rem;
+  height: 0.48rem;
   border-right: 2px solid currentColor;
   border-bottom: 2px solid currentColor;
   content: "";
-  transform: translate(-50%, -62%) rotate(45deg);
+  transform: translate(-50%, -68%) rotate(45deg);
 }
 
 .search-submit-button {
