@@ -72,7 +72,7 @@ Then open `http://localhost:4173`.
 - Stores the last 5 recent searches in `localStorage`, de-duplicated and ordered by recency. Typed searches are recorded after the input stays unchanged for 5 seconds, while Go/Enter records immediately.
 - Supports list and tile result views, with the selected view persisted across visits.
 - Shows a central selected-track image with a simple result-to-image animation.
-- Embeds the selected track with the Mixcloud iframe widget. Selected tracks autoplay by default, and the autoplay preference is persisted across visits.
+- Embeds the selected track with the Mixcloud iframe widget. Selected tracks request autoplay by default, and the autoplay preference is persisted across visits. Browser autoplay policy may still require a user click.
 - Handles debounced search input, in-flight request cancellation, stale-response protection, loading, empty, and error states.
 - Provides keyboard-friendly controls, semantic regions, ARIA labels, live status messages, and focus management after selection.
 - Includes Vitest unit tests for core search history and pagination logic.
@@ -108,6 +108,7 @@ Search requests use `AbortController` and a request id guard. This prevents stal
 
 - Architecture: `instructions/architecture.md`
 - Project standard: `instructions/The-Horizon-Standard.md`
+- Optional backend/proxy notes: `docs/backend-proxy.md`
 
 ## Git History
 
