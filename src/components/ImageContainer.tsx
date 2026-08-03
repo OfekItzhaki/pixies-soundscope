@@ -47,6 +47,7 @@ export function ImageContainer({
   onAnimationComplete,
 }: ImageContainerProps): ReactElement {
   const playerWidgetRef = useRef<MixcloudPlayerWidget | null>(null);
+  const playerStartedRef = useRef(false);
   const hasImage = Boolean(selectedTrack?.imageUrl);
   const playableEmbedUrl = selectedTrack ? buildPlayableEmbedUrl(selectedTrack.embedUrl) : undefined;
   const flyerStyle: FlyerStyle | undefined = animation
@@ -64,6 +65,7 @@ export function ImageContainer({
 
   useEffect(() => {
     playerWidgetRef.current = null;
+    playerStartedRef.current = false;
   }, [playerVisible, selectedTrack?.id]);
 
   const handleSelectedTrackClick = (): void => {
@@ -71,8 +73,15 @@ export function ImageContainer({
       return;
     }
 
-    if (playerVisible && playerWidgetRef.current) {
-      void playerWidgetRef.current.togglePlay();
+    const playerWidget = playerWidgetRef.current;
+
+    if (playerVisible && playerWidget) {
+      if (playerStartedRef.current) {
+        void playerWidget.togglePlay();
+        return;
+      }
+
+      void playerWidget.play();
       return;
     }
 
@@ -140,6 +149,9 @@ export function ImageContainer({
           shouldStartPlaying={autoplaySelection}
           onReady={(widget) => {
             playerWidgetRef.current = widget;
+            widget.events.play.on(() => {
+              playerStartedRef.current = true;
+            });
           }}
         />
       ) : null}
@@ -156,8 +168,15 @@ interface MixcloudPlayerProps {
 
 interface MixcloudPlayerWidget {
   readonly ready: Promise<void>;
+  readonly events: {
+    readonly play: MixcloudWidgetEvent;
+  };
   play(): Promise<void>;
   togglePlay(): Promise<void>;
+}
+
+interface MixcloudWidgetEvent {
+  on(listener: () => void): void;
 }
 
 interface MixcloudWidgetApi {
