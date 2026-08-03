@@ -1,4 +1,4 @@
-# PiXies – SoundScope Architecture
+# PiXies - SoundScope Architecture
 
 ## Overview
 
@@ -30,45 +30,45 @@ The application targets the latest Chrome release.
 
 - `src/`
   - `api/`
-    - `soundApiClient.ts` — wraps Mixcloud API calls and exposes typed functions.
+    - `soundApiClient.ts` - wraps Mixcloud API calls and exposes typed functions.
   - `state/`
-    - `SearchStateContext.tsx` — React context and provider for search state.
-    - `useSearchState.ts` — hook for consuming search state.
-    - `searchHistoryManager.ts` — pure TypeScript module for recent searches logic.
-    - `paginationManager.ts` — pure TypeScript module for cursor-based pagination logic.
+    - `SearchStateContext.tsx` - React context and provider for search state.
+    - `useSearchState.ts` - hook for consuming search state.
+    - `searchHistoryManager.ts` - pure TypeScript module for recent searches logic.
+    - `paginationManager.ts` - pure TypeScript module for cursor-based pagination logic.
   - `components/`
-    - `App.tsx` — root component wiring containers together.
-    - `SearchContainer.tsx` — search box, Go button, and results container.
-    - `ResultsList.tsx` — list view for search results.
-    - `ResultsGrid.tsx` — tile view for search results.
-    - `PaginationControls.tsx` — Next/Previous and view mode buttons.
-    - `ImageContainer.tsx` — central image and track embed behavior.
-    - `RecentSearchesContainer.tsx` — recent search terms list.
+    - `App.tsx` - root component wiring containers together.
+    - `SearchContainer.tsx` - search box, Go button, and results container.
+    - `ResultsList.tsx` - list view for search results.
+    - `ResultsGrid.tsx` - tile view for search results.
+    - `PaginationControls.tsx` - Next/Previous and view mode buttons.
+    - `ImageContainer.tsx` - central image and track embed behavior.
+    - `RecentSearchesContainer.tsx` - recent search terms list.
   - `utils/`
-    - `debounce.ts` — debouncing helper.
-    - `storage.ts` — thin wrapper around `localStorage`.
+    - `debounce.ts` - debouncing helper.
+    - `storage.ts` - thin wrapper around `localStorage`.
   - `tests/`
-    - `searchHistoryManager.test.ts` — unit tests for history logic.
-    - `paginationManager.test.ts` — unit tests for pagination logic.
-  - `main.tsx` — React entry point.
-  - `index.css` — base styling.
+    - `searchHistoryManager.test.ts` - unit tests for history logic.
+    - `paginationManager.test.ts` - unit tests for pagination logic.
+  - `main.tsx` - React entry point.
+  - `index.css` - base styling.
 
 ## Data and Types
 
 ### Domain Types
 
-- `Track` — internal representation of a sound track.
+- `Track` - internal representation of a sound track.
   - `id: string`
   - `title: string`
   - `imageUrl: string`
   - `embedUrl: string`
 
-- `SearchResponse` — normalized search response from the data layer.
+- `SearchResponse` - normalized search response from the data layer.
   - `tracks: Track[]`
   - `nextCursor?: string`
   - `prevCursor?: string`
 
-- `SearchState` — overall state used by the UI.
+- `SearchState` - overall state used by the UI.
   - `query: string`
   - `results: Track[]`
   - `selectedTrack?: Track`

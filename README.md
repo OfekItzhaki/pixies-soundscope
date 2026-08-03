@@ -1,71 +1,85 @@
-# PiXies – SoundScope
+# PiXies - SoundScope
 
-This project implements the PiXies front-end exam assignment using React and TypeScript. The application uses the Mixcloud sound API to search tracks, display paginated results, maintain recent searches, and play embedded tracks. The focus is on clean architecture, correct async handling, and a good user experience.
+PiXies - SoundScope is a React + TypeScript front-end exam project for searching and playing Mixcloud tracks. It uses a layered architecture so Mixcloud-specific data access stays isolated from state/business logic and UI components.
 
 ## Tech Stack
 
 - Vite
 - React
 - TypeScript
-- CSS (or CSS Modules)
-- Vitest / Jest (for tests)
-
-## Features
-
-- Search for tracks using the Mixcloud sound API.
-- Display results 6 at a time with Next/Previous pagination based on the API's paging cursor.
-- Maintain a recent search history (last 5 terms), de-duplicated and persisted across visits.
-- Clicking a history item triggers a new search.
-- Clicking a search result animates it into a central image container and shows the track image.
-- Clicking the central image embeds and plays the track.
-- Debounced search input (~300ms) with in-flight request cancellation to avoid stale data races.
-- Loading, empty, and error states with a retry option.
-- List and tile views for results, with view preference remembered across visits.
-- Basic accessibility: keyboard navigation, semantic HTML, and ARIA where appropriate.
-
-## Project Structure
-
-See `instructions/architecture.md` for a detailed description of the layers and modules:
-
-- Data/API layer (Mixcloud client)
-- State and business logic (search state, history manager, pagination manager)
-- UI components (search, results, pagination, image container, recent searches)
-- Utilities (debounce, storage)
-- Tests (core logic)
+- Vitest
+- React Testing Library
+- Plain CSS
 
 ## Getting Started
 
-1. Install dependencies:
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-2. Run the development server:
+Run the development server:
 
 ```bash
 npm run dev
 ```
 
-3. Run tests:
+Run the production build:
 
 ```bash
-npm test
+npm run build
 ```
 
-## Requirements Mapping
+Run tests:
 
-This project is designed to meet the exam requirements:
+```bash
+npm test -- --run
+```
 
-- React with TypeScript and properly typed data.
-- Smart, decoupled architecture with separate data, state/business logic, and UI layers.
-- Logic separated from the view layer and reusable components.
-- Correct async handling: debounce, cancellation, and protection against stale responses.
-- Graceful loading, empty, and error states.
-- Accessible UI with keyboard navigation and appropriate semantics.
-- Unit tests for the core logic (search history and pagination).
-- Clean, incremental git history that reflects the implementation steps.
+Run linting:
 
-## Notes
+```bash
+npm run lint
+```
 
-The sound provider (Mixcloud) is encapsulated in the data layer. Swapping to another sound API should require changes only in that layer, without impacting the UI or state logic.
+## Implemented Requirements
+
+- Searches Mixcloud cloudcasts through the data layer.
+- Displays results 6 at a time using Mixcloud cursor URLs for Next and Previous pagination.
+- Stores the last 5 recent searches in `localStorage`, de-duplicated and ordered by recency.
+- Supports list and tile result views, with the selected view persisted across visits.
+- Shows a central selected-track image with a simple result-to-image animation.
+- Embeds the selected track with the Mixcloud iframe widget after the user clicks the central image.
+- Handles debounced search input, in-flight request cancellation, stale-response protection, loading, empty, and error states.
+- Provides keyboard-friendly controls, semantic regions, ARIA labels, live status messages, and focus management after selection.
+- Includes Vitest unit tests for core search history and pagination logic.
+
+## Architecture
+
+The implementation follows `instructions/architecture.md` and keeps layers separated:
+
+- `src/api`: Mixcloud API contracts and `SoundApiClient`.
+- `src/state`: React context orchestration plus pure business logic managers.
+- `src/components`: UI components that consume state through `useSearchState`.
+- `src/utils`: reusable browser-neutral utilities such as storage and debounce.
+- `src/tests`: unit tests for core logic.
+
+The UI never calls Mixcloud directly. Components dispatch actions through the search state hook, and the provider coordinates API calls, pagination decisions, history persistence, view-mode persistence, and request cancellation.
+
+## Key Design Notes
+
+`SoundApiClient` is the only module that knows Mixcloud URLs and response shapes. It maps Mixcloud cloudcasts into the internal `Track` type, so replacing the sound provider should be limited to the data layer.
+
+Recent searches and pagination are pure TypeScript modules. They are easy to test without React, browser rendering, or network access.
+
+Search requests use `AbortController` and a request id guard. This prevents stale responses from replacing newer results during rapid typing or pagination.
+
+## Documentation
+
+- Architecture: `instructions/architecture.md`
+- Project standard: `instructions/The-Horizon-Standard.md`
+
+## Git History
+
+The project was implemented in small conventional commits, moving from scaffold to domain contracts, API client, core logic, state orchestration, UI, accessibility polish, tests, and final documentation.
