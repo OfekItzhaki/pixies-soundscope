@@ -543,8 +543,9 @@ input:focus-visible {
 }
 
 @media (min-width: 761px) {
-  .app-layout > .recent-searches {
-    margin-top: -4.5rem;
+  .app-header > .theme-toggle {
+    align-self: end;
+    transform: translateY(0.75rem);
   }
 }
 
