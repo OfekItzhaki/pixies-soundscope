@@ -138,11 +138,13 @@ export function SearchContainer(): ReactElement {
         playerVisible={Boolean(state.selectedTrack && visiblePlayerTrackId === state.selectedTrack.id)}
         autoplaySelection={autoplaySelection}
         onPlayerToggle={() =>
-          setVisiblePlayerTrackId((currentTrackId) =>
-            state.selectedTrack && currentTrackId !== state.selectedTrack.id
-              ? state.selectedTrack.id
-              : undefined,
-          )
+          setVisiblePlayerTrackId((currentTrackId) => {
+            if (!state.selectedTrack || currentTrackId === state.selectedTrack.id) {
+              return currentTrackId;
+            }
+
+            return state.selectedTrack.id;
+          })
         }
         onAutoplaySelectionChange={handleAutoplaySelectionChange}
         onAnimationComplete={(track) => {

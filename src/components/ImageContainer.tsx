@@ -79,7 +79,7 @@ export function ImageContainer({
         disabled={!selectedTrack}
         aria-label={
           selectedTrack
-            ? `${playerVisible ? 'Hide player for' : 'Play'} ${selectedTrack.title}`
+            ? `${playerVisible ? 'Player controls are open for' : 'Open player for'} ${selectedTrack.title}`
             : 'No track selected'
         }
       >
