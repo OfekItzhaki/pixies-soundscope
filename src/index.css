@@ -542,6 +542,12 @@ input:focus-visible {
   background: var(--color-accent-soft);
 }
 
+@media (min-width: 761px) {
+  .app-layout > .recent-searches {
+    margin-top: -4.5rem;
+  }
+}
+
 @media (max-width: 760px) {
   .app-header {
     grid-template-columns: 1fr;
