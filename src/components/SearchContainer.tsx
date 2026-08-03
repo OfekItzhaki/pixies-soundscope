@@ -10,7 +10,7 @@ import { PaginationControls } from './PaginationControls';
 import { ResultsGrid } from './ResultsGrid';
 import { ResultsList } from './ResultsList';
 
-const SEARCH_DEBOUNCE_MS = 300;
+const SEARCH_DEBOUNCE_MS = 5000;
 const RECENT_SEARCH_STABILITY_MS = 5000;
 const AUTOPLAY_SELECTION_STORAGE_KEY = 'pixies-soundscope:autoplay-selection';
 

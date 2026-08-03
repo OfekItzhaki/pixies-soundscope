@@ -126,7 +126,7 @@ export function SearchStateProvider({
           return;
         }
 
-        dispatch({ type: 'search-success', response, preserveSelectedTrack: Boolean(cursor) });
+        dispatch({ type: 'search-success', response, preserveSelectedTrack: true });
 
         if (!cursor && options?.recordInHistory) {
           recordRecentSearch(normalizedQuery);
