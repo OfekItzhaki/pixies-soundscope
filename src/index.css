@@ -131,6 +131,10 @@ input:focus-visible {
 }
 
 .app-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 18rem;
+  gap: 1.75rem;
+  align-items: start;
   margin-bottom: 2.5rem;
 }
 
@@ -208,11 +212,6 @@ input:focus-visible {
   grid-template-columns: minmax(0, 1fr) 18rem;
   gap: 1.75rem;
   align-items: start;
-}
-
-.side-rail {
-  display: grid;
-  gap: 1.25rem;
 }
 
 .search-panel,
