@@ -35,8 +35,10 @@ export function ImageContainer({
   targetRef,
   onAnimationComplete,
 }: ImageContainerProps): ReactElement {
-  const [playerVisible, setPlayerVisible] = useState(false);
+  const [visiblePlayerTrackId, setVisiblePlayerTrackId] = useState<string | undefined>();
   const hasImage = Boolean(selectedTrack?.imageUrl);
+  const playerVisible = Boolean(selectedTrack && visiblePlayerTrackId === selectedTrack.id);
+  const playableEmbedUrl = selectedTrack ? buildPlayableEmbedUrl(selectedTrack.embedUrl) : undefined;
   const flyerStyle: FlyerStyle | undefined = animation
     ? {
         '--flyer-from-x': `${animation.from.left}px`,
@@ -56,7 +58,11 @@ export function ImageContainer({
       <button
         type="button"
         className={`selected-track ${selectedTrack ? 'selected-track-ready' : ''}`}
-        onClick={() => setPlayerVisible((visible) => (selectedTrack ? !visible : false))}
+        onClick={() =>
+          setVisiblePlayerTrackId((currentTrackId) =>
+            selectedTrack && currentTrackId !== selectedTrack.id ? selectedTrack.id : undefined,
+          )
+        }
         disabled={!selectedTrack}
         aria-label={selectedTrack ? `Play ${selectedTrack.title}` : 'No track selected'}
       >
@@ -80,7 +86,7 @@ export function ImageContainer({
           style={flyerStyle}
           onAnimationEnd={() => {
             onAnimationComplete(animation.track);
-            setPlayerVisible(false);
+            setVisiblePlayerTrackId(undefined);
           }}
           aria-hidden="true"
         >
@@ -88,14 +94,33 @@ export function ImageContainer({
         </div>
       ) : null}
 
-      {selectedTrack && playerVisible ? (
-        <iframe
-          className="track-player"
-          title={`Mixcloud player for ${selectedTrack.title}`}
-          src={selectedTrack.embedUrl}
-          allow="autoplay"
-        />
+      {selectedTrack && playerVisible && playableEmbedUrl ? (
+        <MixcloudPlayer track={selectedTrack} embedUrl={playableEmbedUrl} />
       ) : null}
     </section>
   );
+}
+
+interface MixcloudPlayerProps {
+  track: Track;
+  embedUrl: string;
+}
+
+function MixcloudPlayer({ track, embedUrl }: MixcloudPlayerProps): ReactElement {
+  return (
+    <iframe
+      className="track-player"
+      title={`Mixcloud player for ${track.title}`}
+      src={embedUrl}
+      allow="autoplay; encrypted-media"
+      loading="lazy"
+    />
+  );
+}
+
+function buildPlayableEmbedUrl(embedUrl: string): string {
+  const playableEmbedUrl = new URL(embedUrl);
+  playableEmbedUrl.searchParams.set('autoplay', '1');
+
+  return playableEmbedUrl.toString();
 }
