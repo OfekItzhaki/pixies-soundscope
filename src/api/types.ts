@@ -15,6 +15,11 @@ export interface SoundApiClient {
   searchTracks(query: string, cursor?: string, signal?: AbortSignal): Promise<SearchResponse>;
 }
 
+export type FetchFunction = (
+  input: RequestInfo | URL,
+  init?: RequestInit,
+) => Promise<Response>;
+
 export interface MixcloudSearchParams {
   query: string;
   cursor?: string;
