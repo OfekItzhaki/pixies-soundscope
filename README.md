@@ -43,6 +43,10 @@ Run linting:
 npm run lint
 ```
 
+## CI
+
+GitHub Actions runs linting, production build, unit tests, and a high-severity dependency audit on pull requests and pushes to `main`. Enable branch protection on `main` and require the `Verify` workflow before merging to keep the deployed branch stable.
+
 ## Run with Docker
 
 Build the production image:
