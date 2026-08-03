@@ -5,8 +5,8 @@ export interface SearchHistoryStorage {
   write(history: string[]): void;
 }
 
-export const MAX_RECENT_SEARCHES = 5;
-export const SEARCH_HISTORY_STORAGE_KEY = 'pixies-soundscope:recent-searches';
+const MAX_RECENT_SEARCHES = 5;
+const SEARCH_HISTORY_STORAGE_KEY = 'pixies-soundscope:recent-searches';
 
 export function createSearchHistoryStorage(
   storage?: KeyValueStorage,

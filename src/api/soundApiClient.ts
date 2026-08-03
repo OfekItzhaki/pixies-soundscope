@@ -10,7 +10,7 @@ import type {
 const MIXCLOUD_API_BASE_URL = 'https://api.mixcloud.com';
 const SEARCH_PAGE_SIZE = '6';
 
-export class MixcloudApiError extends Error {
+class MixcloudApiError extends Error {
   constructor(
     message: string,
     readonly status?: number,

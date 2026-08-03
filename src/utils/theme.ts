@@ -7,7 +7,7 @@ export function isThemePreference(value: string): value is ThemePreference {
   return value === 'light' || value === 'dark' || value === 'system';
 }
 
-export function getSystemThemePreference(): ResolvedTheme {
+function getSystemThemePreference(): ResolvedTheme {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 

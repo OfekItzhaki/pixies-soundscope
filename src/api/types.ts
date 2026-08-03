@@ -20,12 +20,7 @@ export type FetchFunction = (
   init?: RequestInit,
 ) => Promise<Response>;
 
-export interface MixcloudSearchParams {
-  query: string;
-  cursor?: string;
-}
-
-export interface MixcloudPictureSet {
+interface MixcloudPictureSet {
   readonly medium?: string;
   readonly large?: string;
   readonly extra_large?: string;
@@ -38,7 +33,7 @@ export interface MixcloudCloudcast {
   readonly pictures?: MixcloudPictureSet;
 }
 
-export interface MixcloudPaging {
+interface MixcloudPaging {
   readonly next?: string;
   readonly previous?: string;
 }

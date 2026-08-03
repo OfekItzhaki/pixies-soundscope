@@ -52,6 +52,3 @@ export function setStringArrayItem(
   storage.setItem(key, JSON.stringify(value));
 }
 
-export function removeItem(key: string, storage: KeyValueStorage = window.localStorage): void {
-  storage.removeItem(key);
-}
