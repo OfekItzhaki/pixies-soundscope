@@ -62,7 +62,7 @@ export function ImageContainer({
       <button
         ref={selectedButtonRef}
         type="button"
-        className={`selected-track ${selectedTrack ? 'selected-track-ready' : ''}`}
+        className={`selected-track ${selectedTrack ? 'selected-track-ready' : 'selected-track-empty'}`}
         onClick={onPlayerToggle}
         disabled={!selectedTrack}
         aria-label={
@@ -79,7 +79,10 @@ export function ImageContainer({
               <span className="selected-placeholder">{selectedTrack.title}</span>
             )
           ) : (
-            <span className="selected-placeholder">Choose a result</span>
+            <span className="selected-placeholder selected-placeholder-empty">
+              <span className="placeholder-mark">PiXies</span>
+              <span className="placeholder-title">SoundScope</span>
+            </span>
           )}
         </div>
       </button>
