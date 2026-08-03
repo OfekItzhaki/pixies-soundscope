@@ -12,16 +12,27 @@ export function RecentSearchesContainer(): ReactElement {
         <ul>
           {state.recentSearches.map((term) => (
             <li key={term}>
-              <button
-                type="button"
-                aria-label={`Search again for ${term}`}
-                onClick={() => {
-                  actions.setQuery(term);
-                  void actions.performSearch(term, { recordInHistory: true });
-                }}
-              >
-                {term}
-              </button>
+              <div className="recent-search-item">
+                <button
+                  type="button"
+                  className="recent-search-term"
+                  aria-label={`Search again for ${term}`}
+                  onClick={() => {
+                    actions.setQuery(term);
+                    void actions.performSearch(term, { recordInHistory: true });
+                  }}
+                >
+                  {term}
+                </button>
+                <button
+                  type="button"
+                  className="recent-search-remove"
+                  aria-label={`Remove ${term} from recent searches`}
+                  onClick={() => actions.removeRecentSearch(term)}
+                >
+                  x
+                </button>
+              </div>
             </li>
           ))}
         </ul>

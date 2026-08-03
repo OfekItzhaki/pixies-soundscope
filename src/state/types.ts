@@ -19,6 +19,7 @@ export interface SearchStateActions {
   setQuery(query: string): void;
   performSearch(query: string, options?: SearchRequestOptions): Promise<void>;
   recordRecentSearch(query: string): void;
+  removeRecentSearch(query: string): void;
   goToNextPage(): Promise<void>;
   goToPreviousPage(): Promise<void>;
   selectTrack(track: Track): void;

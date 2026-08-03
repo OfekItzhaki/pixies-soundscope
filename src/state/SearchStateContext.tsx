@@ -14,6 +14,7 @@ import { canGoNext, canGoPrevious, getCursorForDirection } from './paginationMan
 import {
   createSearchHistoryStorage,
   loadHistory,
+  removeHistoryTerm,
   saveHistory,
   updateHistory,
   type SearchHistoryStorage,
@@ -89,6 +90,15 @@ export function SearchStateProvider({
     [searchHistoryStorage],
   );
 
+  const removeRecentSearch = useCallback(
+    (query: string): void => {
+      const nextHistory = removeHistoryTerm(stateRef.current.recentSearches, query);
+      saveHistory(searchHistoryStorage, nextHistory);
+      dispatch({ type: 'set-recent-searches', recentSearches: nextHistory });
+    },
+    [searchHistoryStorage],
+  );
+
   const runSearch = useCallback(
     async (query: string, cursor?: string, options?: SearchRequestOptions): Promise<void> => {
       const normalizedQuery = query.trim();
@@ -141,6 +151,7 @@ export function SearchStateProvider({
       performSearch: (query: string, options?: SearchRequestOptions): Promise<void> =>
         runSearch(query, undefined, options),
       recordRecentSearch,
+      removeRecentSearch,
       goToNextPage: (): Promise<void> => {
         const { query, nextCursor, prevCursor } = stateRef.current;
 
@@ -165,7 +176,7 @@ export function SearchStateProvider({
         dispatch({ type: 'set-view-mode', viewMode });
       },
     }),
-    [recordRecentSearch, runSearch, viewModeStorage],
+    [recordRecentSearch, removeRecentSearch, runSearch, viewModeStorage],
   );
 
   const contextValue = useMemo<SearchStateContextValue>(

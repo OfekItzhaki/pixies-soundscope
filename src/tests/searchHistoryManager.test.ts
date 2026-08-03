@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   createSearchHistoryStorage,
   loadHistory,
+  removeHistoryTerm,
   saveHistory,
   updateHistory,
 } from '../state/searchHistoryManager';
@@ -36,6 +37,13 @@ describe('searchHistoryManager', () => {
     saveHistory(historyStorage, ['jazz', 'ambient', 'jazz', '']);
 
     expect(loadHistory(historyStorage)).toEqual(['jazz', 'ambient']);
+  });
+
+  it('removes a term case-insensitively while keeping the remaining history sanitized', () => {
+    expect(removeHistoryTerm(['Jazz', 'ambient', 'deep   house', 'ambient'], ' jazz ')).toEqual([
+      'ambient',
+      'deep house',
+    ]);
   });
 });
 

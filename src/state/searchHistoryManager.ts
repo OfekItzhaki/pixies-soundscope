@@ -40,6 +40,18 @@ export function updateHistory(history: string[], newTerm: string): string[] {
   return [normalizedTerm, ...remainingTerms].slice(0, MAX_RECENT_SEARCHES);
 }
 
+export function removeHistoryTerm(history: string[], termToRemove: string): string[] {
+  const normalizedTermToRemove = normalizeSearchTerm(termToRemove);
+
+  if (!normalizedTermToRemove) {
+    return sanitizeHistory(history);
+  }
+
+  return sanitizeHistory(history).filter(
+    (term) => term.toLocaleLowerCase() !== normalizedTermToRemove.toLocaleLowerCase(),
+  );
+}
+
 function sanitizeHistory(history: string[]): string[] {
   return history.reduce<string[]>((uniqueTerms, term) => {
     const normalizedTerm = normalizeSearchTerm(term);

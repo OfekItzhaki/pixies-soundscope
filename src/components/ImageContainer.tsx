@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import type { CSSProperties, ReactElement, RefObject } from 'react';
 
 import type { Track } from '../api/types';
@@ -126,9 +127,38 @@ interface MixcloudPlayerProps {
 }
 
 function MixcloudPlayer({ track, embedUrl }: MixcloudPlayerProps): ReactElement {
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+
+  useEffect(() => {
+    const iframeElement = iframeRef.current;
+    const widgetApi = window.Mixcloud;
+    let isCancelled = false;
+
+    if (!iframeElement || !widgetApi) {
+      return undefined;
+    }
+
+    const widget = widgetApi.PlayerWidget(iframeElement);
+
+    void widget.ready
+      .then(() => {
+        if (isCancelled) {
+          return undefined;
+        }
+
+        return widget.load(track.id, true);
+      })
+      .catch(() => undefined);
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [track.id]);
+
   return (
     <div className="track-player-frame">
       <iframe
+        ref={iframeRef}
         className="track-player"
         title={`Mixcloud player for ${track.title}`}
         src={embedUrl}
@@ -144,4 +174,19 @@ function buildPlayableEmbedUrl(embedUrl: string): string {
   playableEmbedUrl.searchParams.set('autoplay', '1');
 
   return playableEmbedUrl.toString();
+}
+
+interface MixcloudWidget {
+  ready: Promise<void>;
+  load(cloudcastKey: string, startPlaying: boolean): Promise<void>;
+}
+
+interface MixcloudWidgetApi {
+  PlayerWidget(iframeElement: HTMLIFrameElement): MixcloudWidget;
+}
+
+declare global {
+  interface Window {
+    Mixcloud?: MixcloudWidgetApi;
+  }
 }
