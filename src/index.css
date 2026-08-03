@@ -41,6 +41,12 @@ button:not(:disabled):hover {
   border-color: #1f7a8c;
 }
 
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid #7cc8d5;
+  outline-offset: 2px;
+}
+
 .app-shell {
   width: min(100% - 2rem, 72rem);
   margin: 0 auto;
@@ -128,6 +134,10 @@ button:not(:disabled):hover {
 .status-message {
   margin: 1rem 0;
   color: #4f5f68;
+}
+
+.status-region {
+  min-height: 1.5rem;
 }
 
 .status-message-error {

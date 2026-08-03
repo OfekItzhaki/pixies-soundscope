@@ -185,6 +185,7 @@ function searchStateReducer(state: SearchState, action: SearchStateAction): Sear
     case 'search-success':
       return {
         ...state,
+        lastSearchedQuery: state.query,
         results: action.response.tracks,
         selectedTrack: undefined,
         loading: false,
@@ -195,6 +196,7 @@ function searchStateReducer(state: SearchState, action: SearchStateAction): Sear
     case 'search-error':
       return {
         ...state,
+        lastSearchedQuery: state.query,
         loading: false,
         error: action.error,
       };

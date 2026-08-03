@@ -13,6 +13,7 @@ interface ImageContainerProps {
   selectedTrack?: Track;
   animation?: SelectionAnimation;
   targetRef: RefObject<HTMLDivElement | null>;
+  selectedButtonRef: RefObject<HTMLButtonElement | null>;
   onAnimationComplete(track: Track): void;
 }
 
@@ -33,6 +34,7 @@ export function ImageContainer({
   selectedTrack,
   animation,
   targetRef,
+  selectedButtonRef,
   onAnimationComplete,
 }: ImageContainerProps): ReactElement {
   const [visiblePlayerTrackId, setVisiblePlayerTrackId] = useState<string | undefined>();
@@ -56,6 +58,7 @@ export function ImageContainer({
     <section className="image-container" aria-labelledby="selected-track-heading">
       <h2 id="selected-track-heading">Selected track</h2>
       <button
+        ref={selectedButtonRef}
         type="button"
         className={`selected-track ${selectedTrack ? 'selected-track-ready' : ''}`}
         onClick={() =>
@@ -64,7 +67,11 @@ export function ImageContainer({
           )
         }
         disabled={!selectedTrack}
-        aria-label={selectedTrack ? `Play ${selectedTrack.title}` : 'No track selected'}
+        aria-label={
+          selectedTrack
+            ? `${playerVisible ? 'Hide player for' : 'Play'} ${selectedTrack.title}`
+            : 'No track selected'
+        }
       >
         <div ref={targetRef} className="selected-track-target">
           {selectedTrack ? (
@@ -114,6 +121,7 @@ function MixcloudPlayer({ track, embedUrl }: MixcloudPlayerProps): ReactElement 
       src={embedUrl}
       allow="autoplay; encrypted-media"
       loading="lazy"
+      aria-label={`Mixcloud embedded player for ${track.title}`}
     />
   );
 }

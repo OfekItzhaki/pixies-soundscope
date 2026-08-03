@@ -4,6 +4,7 @@ export type ViewMode = 'list' | 'tile';
 
 export interface SearchState {
   query: string;
+  lastSearchedQuery?: string;
   results: Track[];
   selectedTrack?: Track;
   viewMode: ViewMode;

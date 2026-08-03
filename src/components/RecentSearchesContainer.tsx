@@ -14,6 +14,7 @@ export function RecentSearchesContainer(): ReactElement {
             <li key={term}>
               <button
                 type="button"
+                aria-label={`Search again for ${term}`}
                 onClick={() => {
                   actions.setQuery(term);
                   void actions.performSearch(term);

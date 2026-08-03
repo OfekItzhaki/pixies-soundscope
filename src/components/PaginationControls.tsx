@@ -22,6 +22,7 @@ export function PaginationControls(): ReactElement | null {
           type="button"
           onClick={() => void actions.goToPreviousPage()}
           disabled={state.loading || !canGoPrevious(state.prevCursor)}
+          aria-label="Go to previous page of results"
         >
           Previous
         </button>
@@ -29,6 +30,7 @@ export function PaginationControls(): ReactElement | null {
           type="button"
           onClick={() => void actions.goToNextPage()}
           disabled={state.loading || !canGoNext(state.nextCursor)}
+          aria-label="Go to next page of results"
         >
           Next
         </button>
@@ -39,6 +41,7 @@ export function PaginationControls(): ReactElement | null {
           type="button"
           className={state.viewMode === 'list' ? 'active' : undefined}
           aria-pressed={state.viewMode === 'list'}
+          aria-label="Show results as a list"
           onClick={() => setViewMode('list')}
         >
           List
@@ -47,6 +50,7 @@ export function PaginationControls(): ReactElement | null {
           type="button"
           className={state.viewMode === 'tile' ? 'active' : undefined}
           aria-pressed={state.viewMode === 'tile'}
+          aria-label="Show results as tiles"
           onClick={() => setViewMode('tile')}
         >
           Tile

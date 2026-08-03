@@ -14,8 +14,14 @@ const SEARCH_DEBOUNCE_MS = 300;
 export function SearchContainer(): ReactElement {
   const { state, actions } = useSearchState();
   const imageTargetRef = useRef<HTMLDivElement | null>(null);
+  const selectedTrackButtonRef = useRef<HTMLButtonElement | null>(null);
   const animationIdRef = useRef(0);
   const [selectionAnimation, setSelectionAnimation] = useState<SelectionAnimation | undefined>();
+  const hasCompletedEmptySearch =
+    !state.loading &&
+    !state.error &&
+    Boolean(state.lastSearchedQuery) &&
+    state.results.length === 0;
   const debouncedSearch = useMemo(
     () =>
       debounce((query: string) => {
@@ -58,7 +64,7 @@ export function SearchContainer(): ReactElement {
   };
 
   return (
-    <section className="search-panel" aria-labelledby="search-heading">
+    <section className="search-panel" aria-labelledby="search-heading" aria-busy={state.loading}>
       <h2 id="search-heading">Find tracks</h2>
 
       <form className="search-form" onSubmit={handleSubmit}>
@@ -73,6 +79,7 @@ export function SearchContainer(): ReactElement {
             onChange={handleQueryChange}
             placeholder="Try deep house, jazz, ambient..."
             autoComplete="off"
+            aria-describedby="search-status"
           />
           <button type="submit" disabled={state.loading || state.query.trim().length === 0}>
             Go
@@ -80,8 +87,16 @@ export function SearchContainer(): ReactElement {
         </div>
       </form>
 
+      <div id="search-status" className="status-region" aria-live="polite" aria-atomic="true">
+        {state.loading ? <p className="status-message">Searching Mixcloud...</p> : null}
+
+        {hasCompletedEmptySearch ? (
+          <p className="status-message">No tracks found for "{state.lastSearchedQuery}".</p>
+        ) : null}
+      </div>
+
       {state.error ? (
-        <div className="status-message status-message-error" role="alert">
+        <div className="status-message status-message-error" role="alert" aria-live="assertive">
           <p>{state.error}</p>
           <button type="button" onClick={() => void actions.performSearch(state.query)}>
             Retry
@@ -89,19 +104,15 @@ export function SearchContainer(): ReactElement {
         </div>
       ) : null}
 
-      {state.loading ? <p className="status-message">Searching Mixcloud...</p> : null}
-
-      {!state.loading && !state.error && state.query && state.results.length === 0 ? (
-        <p className="status-message">No tracks found for "{state.query}".</p>
-      ) : null}
-
       <ImageContainer
         selectedTrack={state.selectedTrack}
         animation={selectionAnimation}
         targetRef={imageTargetRef}
+        selectedButtonRef={selectedTrackButtonRef}
         onAnimationComplete={(track) => {
           actions.selectTrack(track);
           setSelectionAnimation(undefined);
+          window.requestAnimationFrame(() => selectedTrackButtonRef.current?.focus());
         }}
       />
 

@@ -15,13 +15,14 @@ export function ResultsGrid({ tracks, onSelectTrack }: ResultsGridProps): ReactE
   return (
     <section className="results-section" aria-labelledby="results-heading">
       <h2 id="results-heading">Results</h2>
-      <ul className="results-grid">
+      <ul className="results-grid" aria-label="Search results in tile view">
         {tracks.map((track) => (
           <li key={track.id} className="result-tile">
             <button
               type="button"
               className="result-tile-button"
               onClick={(event) => onSelectTrack(track, event.currentTarget)}
+              aria-label={`Select ${track.title}`}
             >
               <span className="result-tile-image-wrap">
                 {track.imageUrl ? (
