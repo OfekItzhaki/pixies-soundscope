@@ -45,7 +45,21 @@ npm run lint
 
 ## CI/CD
 
-GitHub Actions runs linting, production build, unit tests, and a high-severity dependency audit on pull requests and pushes to `main`. A separate deploy workflow publishes the app to Cloudflare Workers after CI passes on `main`. Enable branch protection on `main` and require the `Verify` workflow before merging to keep the deployed branch stable.
+GitHub Actions runs linting, production build, unit tests, and a high-severity dependency audit on pull requests and pushes to `main`. Enable branch protection on `main` and require the `Verify` workflow before merging to keep the deployed branch stable.
+
+Production deployment is configured through Cloudflare Workers Builds, using the Worker assets configuration in `wrangler.jsonc`.
+
+Use these Cloudflare build settings:
+
+```text
+Build command: npm run build
+Deploy command: npm run deploy
+Version command: git rev-parse --short HEAD
+Root directory: /
+Production branch: main
+```
+
+`npm run deploy:dry-run` verifies locally that Wrangler can read the generated `dist` assets before a real deployment.
 
 ## Run with Docker
 
@@ -112,7 +126,6 @@ Search requests use `AbortController` and a request id guard. This prevents stal
 
 - Architecture: `instructions/architecture.md`
 - Project standard: `instructions/The-Horizon-Standard.md`
-- Cloudflare deployment: `docs/cloudflare-deployment.md`
 - Optional backend/proxy notes: `docs/backend-proxy.md`
 
 ## Git History
