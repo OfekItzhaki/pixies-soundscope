@@ -107,6 +107,9 @@ export function SearchContainer(): ReactElement {
     setStringItem(AUTOPLAY_SELECTION_STORAGE_KEY, enabled ? 'enabled' : 'disabled');
   };
 
+  const hasRecentSearches = state.recentSearches.length > 0;
+  const isRecentSearchesMenuOpen = recentSearchesOpen && hasRecentSearches;
+
   return (
     <section className="search-panel" aria-labelledby="search-heading" aria-busy={state.loading}>
       <h2 id="search-heading">Find tracks</h2>
@@ -137,21 +140,21 @@ export function SearchContainer(): ReactElement {
                   debouncedRecentSearch.cancel();
                 }}
               >
-                ×
+                <span aria-hidden="true" className="icon-x" />
               </button>
             ) : null}
             <button
               type="button"
               className="search-icon-button"
               aria-label="Show recent searches"
-              aria-expanded={recentSearchesOpen}
+              aria-expanded={isRecentSearchesMenuOpen}
               aria-controls="recent-searches-menu"
-              disabled={state.recentSearches.length === 0}
+              disabled={!hasRecentSearches}
               onClick={() => setRecentSearchesOpen((isOpen) => !isOpen)}
             >
-              ⌄
+              <span aria-hidden="true" className="icon-chevron-down" />
             </button>
-            {recentSearchesOpen ? (
+            {isRecentSearchesMenuOpen ? (
               <div id="recent-searches-menu" className="recent-searches-menu" role="menu">
                 {state.recentSearches.map((term) => (
                   <div key={term} className="recent-search-menu-item">
@@ -169,7 +172,7 @@ export function SearchContainer(): ReactElement {
                       aria-label={`Remove ${term} from recent searches`}
                       onClick={() => actions.removeRecentSearch(term)}
                     >
-                      ×
+                      <span aria-hidden="true" className="icon-x" />
                     </button>
                   </div>
                 ))}

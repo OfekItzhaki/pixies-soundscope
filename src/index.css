@@ -317,6 +317,46 @@ input:focus-visible {
   border-bottom-right-radius: var(--radius-control);
 }
 
+.icon-x,
+.icon-chevron-down {
+  position: relative;
+  display: block;
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.icon-x::before,
+.icon-x::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.85rem;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  content: "";
+}
+
+.icon-x::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.icon-x::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.icon-chevron-down::before {
+  position: absolute;
+  top: 0.2rem;
+  left: 0.22rem;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  content: "";
+  transform: rotate(45deg);
+}
+
 .search-submit-button {
   border-color: var(--color-accent);
   background: var(--color-accent);
@@ -492,9 +532,14 @@ input:focus-visible {
 .track-player {
   display: block;
   width: 100%;
-  height: 8.5rem;
+  height: 7.1rem;
   border: 0;
   margin-top: 0.22rem;
+}
+
+.result-item,
+.result-tile {
+  display: block;
 }
 
 .results-list,
@@ -502,7 +547,9 @@ input:focus-visible {
 .recent-searches-menu {
   display: grid;
   gap: 0.6rem;
+  padding: 0;
   margin: 0;
+  list-style: none;
 }
 
 .results-grid {
