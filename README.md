@@ -43,6 +43,28 @@ Run linting:
 npm run lint
 ```
 
+## Run with Docker
+
+Build the production image:
+
+```bash
+docker build -t pixies-soundscope .
+```
+
+Run the container on port `4173`:
+
+```bash
+docker run -p 4173:4173 pixies-soundscope
+```
+
+Or run it with Docker Compose:
+
+```bash
+docker compose up --build
+```
+
+Then open `http://localhost:4173`.
+
 ## Implemented Requirements
 
 - Searches Mixcloud cloudcasts through the data layer.
@@ -59,11 +81,18 @@ npm run lint
 
 The implementation follows `instructions/architecture.md` and keeps layers separated:
 
-- `src/api`: Mixcloud API contracts and `SoundApiClient`.
-- `src/state`: React context orchestration plus pure business logic managers.
-- `src/components`: UI components that consume state through `useSearchState`.
-- `src/utils`: reusable browser-neutral utilities such as storage and debounce.
-- `src/tests`: unit tests for core logic.
+- Data/API layer (`src/api`): Mixcloud API contracts and `SoundApiClient`.
+- State/business logic layer (`src/state`, `src/utils`): React context orchestration, search history, pagination, storage, and debounce.
+- UI layer (`src/components`): search, result views, pagination controls, recent searches, image selection, and Mixcloud playback.
+
+Tests live in `src/tests` and focus on browser-neutral business logic.
+
+```text
+UI components
+  -> useSearchState hook / SearchStateProvider
+    -> SoundApiClient + history, pagination, storage, debounce utilities
+      -> Mixcloud search and embed endpoints
+```
 
 The UI never calls Mixcloud directly. Components dispatch actions through the search state hook, and the provider coordinates API calls, pagination decisions, history persistence, view-mode persistence, and request cancellation.
 
