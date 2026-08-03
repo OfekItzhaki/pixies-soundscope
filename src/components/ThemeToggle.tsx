@@ -10,7 +10,7 @@ interface ThemeToggleProps {
 const themeOptions: Array<{ label: string; value: ThemePreference }> = [
   { label: 'Light', value: 'light' },
   { label: 'Dark', value: 'dark' },
-  { label: 'System', value: 'system' },
+  { label: 'Auto', value: 'system' },
 ];
 
 export function ThemeToggle({ preference, onPreferenceChange }: ThemeToggleProps): ReactElement {
