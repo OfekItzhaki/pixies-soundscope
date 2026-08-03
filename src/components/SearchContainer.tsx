@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { ChangeEvent, FormEvent, ReactElement } from 'react';
+import type { ChangeEvent, FocusEvent, FormEvent, ReactElement } from 'react';
 
 import type { Track } from '../api/types';
 import { useSearchState } from '../state/useSearchState';
@@ -21,6 +21,7 @@ export function SearchContainer(): ReactElement {
   const animationIdRef = useRef(0);
   const [selectionAnimation, setSelectionAnimation] = useState<SelectionAnimation | undefined>();
   const [visiblePlayerTrackId, setVisiblePlayerTrackId] = useState<string | undefined>();
+  const [recentSearchesOpen, setRecentSearchesOpen] = useState(false);
   const [autoplaySelection, setAutoplaySelection] = useState<boolean>(
     () => getStringItem(AUTOPLAY_SELECTION_STORAGE_KEY, 'enabled') !== 'disabled',
   );
@@ -60,10 +61,27 @@ export function SearchContainer(): ReactElement {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
+    setRecentSearchesOpen(false);
     debouncedSearch.cancel();
     debouncedRecentSearch.cancel();
     actions.recordRecentSearch(state.query);
     void actions.performSearch(state.query);
+  };
+
+  const handleRecentSearchSelect = (term: string): void => {
+    setRecentSearchesOpen(false);
+    debouncedSearch.cancel();
+    debouncedRecentSearch.cancel();
+    actions.setQuery(term);
+    void actions.performSearch(term, { recordInHistory: true });
+  };
+
+  const handleSearchControlBlur = (event: FocusEvent<HTMLDivElement>): void => {
+    const nextFocusedElement = event.relatedTarget;
+
+    if (!(nextFocusedElement instanceof Node) || !event.currentTarget.contains(nextFocusedElement)) {
+      setRecentSearchesOpen(false);
+    }
   };
 
   const handleSelectTrack = (track: Track, sourceElement: HTMLElement): void => {
@@ -97,17 +115,72 @@ export function SearchContainer(): ReactElement {
         <label className="search-label" htmlFor="track-search">
           Search term
         </label>
-        <div className="search-row">
-          <input
-            id="track-search"
-            type="search"
-            value={state.query}
-            onChange={handleQueryChange}
-            placeholder="Try deep house, jazz, ambient..."
-            autoComplete="off"
-            aria-describedby="search-status"
-          />
-          <button type="submit" disabled={state.loading || state.query.trim().length === 0}>
+        <div className="search-row" onBlur={handleSearchControlBlur}>
+          <div className="search-input-shell">
+            <input
+              id="track-search"
+              type="text"
+              value={state.query}
+              onChange={handleQueryChange}
+              placeholder="Try deep house, jazz, ambient..."
+              autoComplete="off"
+              aria-describedby="search-status"
+            />
+            {state.query ? (
+              <button
+                type="button"
+                className="search-icon-button"
+                aria-label="Clear search term"
+                onClick={() => {
+                  actions.setQuery('');
+                  debouncedSearch.cancel();
+                  debouncedRecentSearch.cancel();
+                }}
+              >
+                ×
+              </button>
+            ) : null}
+            <button
+              type="button"
+              className="search-icon-button"
+              aria-label="Show recent searches"
+              aria-expanded={recentSearchesOpen}
+              aria-controls="recent-searches-menu"
+              disabled={state.recentSearches.length === 0}
+              onClick={() => setRecentSearchesOpen((isOpen) => !isOpen)}
+            >
+              ⌄
+            </button>
+            {recentSearchesOpen ? (
+              <div id="recent-searches-menu" className="recent-searches-menu" role="menu">
+                {state.recentSearches.map((term) => (
+                  <div key={term} className="recent-search-menu-item">
+                    <button
+                      type="button"
+                      className="recent-search-term"
+                      role="menuitem"
+                      onClick={() => handleRecentSearchSelect(term)}
+                    >
+                      {term}
+                    </button>
+                    <button
+                      type="button"
+                      className="recent-search-remove"
+                      aria-label={`Remove ${term} from recent searches`}
+                      onClick={() => actions.removeRecentSearch(term)}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+          <button
+            type="submit"
+            className="search-submit-button"
+            disabled={state.loading || state.query.trim().length === 0}
+          >
             Go
           </button>
         </div>

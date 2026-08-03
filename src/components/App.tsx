@@ -8,7 +8,6 @@ import {
   THEME_STORAGE_KEY,
   type ThemePreference,
 } from '../utils/theme';
-import { RecentSearchesContainer } from './RecentSearchesContainer';
 import { SearchContainer } from './SearchContainer';
 import { ThemeToggle } from './ThemeToggle';
 
@@ -49,15 +48,16 @@ export function App(): ReactElement {
         <header className="app-header">
           <div>
             <p className="app-kicker">PiXies</p>
-            <h1>SoundScope</h1>
+            <div className="app-title-row">
+              <h1>SoundScope</h1>
+              <ThemeToggle preference={themePreference} onPreferenceChange={updateThemePreference} />
+            </div>
             <p className="app-subtitle">Search Mixcloud tracks and keep your recent discoveries close.</p>
           </div>
-          <ThemeToggle preference={themePreference} onPreferenceChange={updateThemePreference} />
         </header>
 
         <div className="app-layout">
           <SearchContainer />
-          <RecentSearchesContainer />
         </div>
       </main>
     </SearchStateProvider>
