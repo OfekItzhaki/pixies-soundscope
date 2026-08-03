@@ -57,7 +57,6 @@ export function SearchContainer(): ReactElement {
     }
 
     animationIdRef.current += 1;
-    setVisiblePlayerTrackId(undefined);
     setSelectionAnimation({
       id: animationIdRef.current,
       track,

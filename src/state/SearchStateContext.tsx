@@ -37,7 +37,7 @@ interface SearchStateProviderProps {
 type SearchStateAction =
   | { type: 'set-query'; query: string }
   | { type: 'search-start'; query: string }
-  | { type: 'search-success'; response: SearchResponse }
+  | { type: 'search-success'; response: SearchResponse; preserveSelectedTrack: boolean }
   | { type: 'search-error'; error: string }
   | { type: 'set-recent-searches'; recentSearches: string[] }
   | { type: 'select-track'; track: Track }
@@ -95,7 +95,7 @@ export function SearchStateProvider({
           return;
         }
 
-        dispatch({ type: 'search-success', response });
+        dispatch({ type: 'search-success', response, preserveSelectedTrack: Boolean(cursor) });
 
         if (!cursor) {
           const nextHistory = updateHistory(stateRef.current.recentSearches, normalizedQuery);
@@ -187,7 +187,7 @@ function searchStateReducer(state: SearchState, action: SearchStateAction): Sear
         ...state,
         lastSearchedQuery: state.query,
         results: action.response.tracks,
-        selectedTrack: undefined,
+        selectedTrack: action.preserveSelectedTrack ? state.selectedTrack : undefined,
         loading: false,
         error: undefined,
         nextCursor: action.response.nextCursor,
