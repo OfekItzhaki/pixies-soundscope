@@ -6,6 +6,7 @@ import { useSearchState } from '../state/useSearchState';
 import { debounce } from '../utils/debounce';
 import { ImageContainer, type SelectionAnimation } from './ImageContainer';
 import { PaginationControls } from './PaginationControls';
+import { ResultsGrid } from './ResultsGrid';
 import { ResultsList } from './ResultsList';
 
 const SEARCH_DEBOUNCE_MS = 300;
@@ -104,7 +105,11 @@ export function SearchContainer(): ReactElement {
         }}
       />
 
-      <ResultsList tracks={state.results} onSelectTrack={handleSelectTrack} />
+      {state.viewMode === 'tile' ? (
+        <ResultsGrid tracks={state.results} onSelectTrack={handleSelectTrack} />
+      ) : (
+        <ResultsList tracks={state.results} onSelectTrack={handleSelectTrack} />
+      )}
       <PaginationControls />
     </section>
   );
