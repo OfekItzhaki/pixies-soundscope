@@ -17,6 +17,7 @@ export function SearchContainer(): ReactElement {
   const selectedTrackButtonRef = useRef<HTMLButtonElement | null>(null);
   const animationIdRef = useRef(0);
   const [selectionAnimation, setSelectionAnimation] = useState<SelectionAnimation | undefined>();
+  const [visiblePlayerTrackId, setVisiblePlayerTrackId] = useState<string | undefined>();
   const hasCompletedEmptySearch =
     !state.loading &&
     !state.error &&
@@ -51,10 +52,12 @@ export function SearchContainer(): ReactElement {
 
     if (!targetElement) {
       actions.selectTrack(track);
+      setVisiblePlayerTrackId(track.id);
       return;
     }
 
     animationIdRef.current += 1;
+    setVisiblePlayerTrackId(undefined);
     setSelectionAnimation({
       id: animationIdRef.current,
       track,
@@ -109,8 +112,17 @@ export function SearchContainer(): ReactElement {
         animation={selectionAnimation}
         targetRef={imageTargetRef}
         selectedButtonRef={selectedTrackButtonRef}
+        playerVisible={Boolean(state.selectedTrack && visiblePlayerTrackId === state.selectedTrack.id)}
+        onPlayerToggle={() =>
+          setVisiblePlayerTrackId((currentTrackId) =>
+            state.selectedTrack && currentTrackId !== state.selectedTrack.id
+              ? state.selectedTrack.id
+              : undefined,
+          )
+        }
         onAnimationComplete={(track) => {
           actions.selectTrack(track);
+          setVisiblePlayerTrackId(track.id);
           setSelectionAnimation(undefined);
           window.requestAnimationFrame(() => selectedTrackButtonRef.current?.focus());
         }}

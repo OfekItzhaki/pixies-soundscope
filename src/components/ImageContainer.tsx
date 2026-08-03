@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type ReactElement, type RefObject } from 'react';
+import type { CSSProperties, ReactElement, RefObject } from 'react';
 
 import type { Track } from '../api/types';
 
@@ -14,6 +14,8 @@ interface ImageContainerProps {
   animation?: SelectionAnimation;
   targetRef: RefObject<HTMLDivElement | null>;
   selectedButtonRef: RefObject<HTMLButtonElement | null>;
+  playerVisible: boolean;
+  onPlayerToggle(): void;
   onAnimationComplete(track: Track): void;
 }
 
@@ -35,11 +37,11 @@ export function ImageContainer({
   animation,
   targetRef,
   selectedButtonRef,
+  playerVisible,
+  onPlayerToggle,
   onAnimationComplete,
 }: ImageContainerProps): ReactElement {
-  const [visiblePlayerTrackId, setVisiblePlayerTrackId] = useState<string | undefined>();
   const hasImage = Boolean(selectedTrack?.imageUrl);
-  const playerVisible = Boolean(selectedTrack && visiblePlayerTrackId === selectedTrack.id);
   const playableEmbedUrl = selectedTrack ? buildPlayableEmbedUrl(selectedTrack.embedUrl) : undefined;
   const flyerStyle: FlyerStyle | undefined = animation
     ? {
@@ -61,11 +63,7 @@ export function ImageContainer({
         ref={selectedButtonRef}
         type="button"
         className={`selected-track ${selectedTrack ? 'selected-track-ready' : ''}`}
-        onClick={() =>
-          setVisiblePlayerTrackId((currentTrackId) =>
-            selectedTrack && currentTrackId !== selectedTrack.id ? selectedTrack.id : undefined,
-          )
-        }
+        onClick={onPlayerToggle}
         disabled={!selectedTrack}
         aria-label={
           selectedTrack
@@ -93,7 +91,6 @@ export function ImageContainer({
           style={flyerStyle}
           onAnimationEnd={() => {
             onAnimationComplete(animation.track);
-            setVisiblePlayerTrackId(undefined);
           }}
           aria-hidden="true"
         >
