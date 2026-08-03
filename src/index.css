@@ -347,14 +347,14 @@ input:focus-visible {
 
 .icon-chevron-down::before {
   position: absolute;
-  top: 0.2rem;
-  left: 0.22rem;
-  width: 0.42rem;
-  height: 0.42rem;
+  top: 50%;
+  left: 50%;
+  width: 0.62rem;
+  height: 0.62rem;
   border-right: 2px solid currentColor;
   border-bottom: 2px solid currentColor;
   content: "";
-  transform: rotate(45deg);
+  transform: translate(-50%, -62%) rotate(45deg);
 }
 
 .search-submit-button {
