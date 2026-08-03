@@ -4,6 +4,22 @@ export interface KeyValueStorage {
   removeItem(key: string): void;
 }
 
+export function getStringItem(
+  key: string,
+  fallback: string,
+  storage: KeyValueStorage = window.localStorage,
+): string {
+  return storage.getItem(key) ?? fallback;
+}
+
+export function setStringItem(
+  key: string,
+  value: string,
+  storage: KeyValueStorage = window.localStorage,
+): void {
+  storage.setItem(key, value);
+}
+
 export function getStringArrayItem(
   key: string,
   fallback: string[] = [],
