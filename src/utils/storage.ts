@@ -20,35 +20,6 @@ export function setStringItem(
   storage.setItem(key, value);
 }
 
-export function getJsonItem<T>(
-  key: string,
-  fallback: T,
-  isValid: (value: unknown) => value is T,
-  storage: KeyValueStorage = window.localStorage,
-): T {
-  const storedValue = storage.getItem(key);
-
-  if (!storedValue) {
-    return fallback;
-  }
-
-  try {
-    const parsedValue: unknown = JSON.parse(storedValue);
-
-    return isValid(parsedValue) ? parsedValue : fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-export function setJsonItem<T>(
-  key: string,
-  value: T,
-  storage: KeyValueStorage = window.localStorage,
-): void {
-  storage.setItem(key, JSON.stringify(value));
-}
-
 export function getStringArrayItem(
   key: string,
   fallback: string[] = [],

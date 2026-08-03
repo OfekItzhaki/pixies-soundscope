@@ -18,11 +18,6 @@ import {
   updateHistory,
   type SearchHistoryStorage,
 } from './searchHistoryManager';
-import {
-  createSearchSessionStorage,
-  toPersistedSearchSession,
-  type SearchSessionStorage,
-} from './searchSessionStorage';
 import { SearchStateContext } from './searchStateContextValue';
 import type { SearchState, SearchStateActions, SearchStateContextValue, ViewMode } from './types';
 import { getStringItem, setStringItem, type KeyValueStorage } from '../utils/storage';
@@ -31,13 +26,11 @@ const VIEW_MODE_STORAGE_KEY = 'pixies-soundscope:view-mode';
 
 const defaultSoundApiClient = createSoundApiClient();
 const defaultSearchHistoryStorage = createSearchHistoryStorage();
-const defaultSearchSessionStorage = createSearchSessionStorage();
 
 interface SearchStateProviderProps {
   children: ReactNode;
   soundApiClient?: SoundApiClient;
   searchHistoryStorage?: SearchHistoryStorage;
-  searchSessionStorage?: SearchSessionStorage;
   viewModeStorage?: KeyValueStorage;
 }
 
@@ -54,13 +47,12 @@ export function SearchStateProvider({
   children,
   soundApiClient = defaultSoundApiClient,
   searchHistoryStorage = defaultSearchHistoryStorage,
-  searchSessionStorage = defaultSearchSessionStorage,
   viewModeStorage,
 }: SearchStateProviderProps): ReactElement {
   const [state, dispatch] = useReducer(
     searchStateReducer,
     undefined,
-    () => createInitialState(searchHistoryStorage, searchSessionStorage, viewModeStorage),
+    () => createInitialState(searchHistoryStorage, viewModeStorage),
   );
   const abortControllerRef = useRef<AbortController | null>(null);
   const requestIdRef = useRef(0);
@@ -68,31 +60,6 @@ export function SearchStateProvider({
 
   useEffect(() => {
     stateRef.current = state;
-    searchSessionStorage.write(toPersistedSearchSession(state));
-  }, [searchSessionStorage, state]);
-
-  useEffect(() => {
-    const persistSessionBeforeUnload = (): void => {
-      searchSessionStorage.write(toPersistedSearchSession(stateRef.current));
-    };
-
-    window.addEventListener('pagehide', persistSessionBeforeUnload);
-
-    return () => {
-      window.removeEventListener('pagehide', persistSessionBeforeUnload);
-    };
-  }, [searchSessionStorage]);
-
-  useEffect(() => {
-    const restoreStateReference = (): void => {
-      stateRef.current = state;
-    };
-
-    window.addEventListener('pageshow', restoreStateReference);
-
-    return () => {
-      window.removeEventListener('pageshow', restoreStateReference);
-    };
   }, [state]);
 
   useEffect(() => {
@@ -190,20 +157,13 @@ export function SearchStateProvider({
 
 function createInitialState(
   searchHistoryStorage: SearchHistoryStorage,
-  searchSessionStorage: SearchSessionStorage,
   viewModeStorage?: KeyValueStorage,
 ): SearchState {
-  const persistedSession = searchSessionStorage.read();
-
   return {
-    query: persistedSession?.query ?? '',
-    lastSearchedQuery: persistedSession?.lastSearchedQuery,
-    results: persistedSession?.results ?? [],
-    selectedTrack: persistedSession?.selectedTrack,
+    query: '',
+    results: [],
     viewMode: loadViewMode(viewModeStorage),
     loading: false,
-    nextCursor: persistedSession?.nextCursor,
-    prevCursor: persistedSession?.prevCursor,
     recentSearches: loadHistory(searchHistoryStorage),
   };
 }
