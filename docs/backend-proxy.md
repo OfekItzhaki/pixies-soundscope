@@ -1,12 +1,12 @@
-# Optional Backend Proxy
+# Optional Future Backend Proxy
 
 PiXies - SoundScope currently runs as a static React application. It calls Mixcloud directly from the browser and stores user preferences, recent searches, theme, and view mode in `localStorage`.
 
-That is the simplest correct architecture for the home assignment because there are no secrets, user accounts, shared data, or server-owned state.
+That is the correct architecture for the current home assignment because there are no secrets, user accounts, shared data, or server-owned state. A backend is not required to satisfy the assignment requirements.
 
 ## When To Add A Backend
 
-Add a tiny backend/proxy only if production needs change, for example:
+Add a tiny backend/proxy only if future product requirements change, for example:
 
 - Mixcloud changes CORS behavior.
 - Search requests need rate limiting, caching, or observability.
@@ -16,7 +16,7 @@ Add a tiny backend/proxy only if production needs change, for example:
 
 ## Suggested Shape
 
-Keep the frontend architecture the same and replace only the data boundary:
+If a backend is introduced later, keep the frontend architecture the same and replace only the data boundary:
 
 ```text
 React UI

@@ -126,7 +126,7 @@ Search requests use `AbortController` and a request id guard. This prevents stal
 
 - Architecture: `instructions/architecture.md`
 - Project standard: `instructions/The-Horizon-Standard.md`
-- Optional backend/proxy notes: `docs/backend-proxy.md`
+- Optional future backend/proxy notes: `docs/backend-proxy.md`
 
 ## Git History
 
