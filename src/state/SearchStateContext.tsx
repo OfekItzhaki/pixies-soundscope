@@ -186,7 +186,7 @@ function searchStateReducer(state: SearchState, action: SearchStateAction): Sear
       return {
         ...state,
         results: action.response.tracks,
-        selectedTrack: action.response.tracks[0],
+        selectedTrack: undefined,
         loading: false,
         error: undefined,
         nextCursor: action.response.nextCursor,

@@ -1,0 +1,101 @@
+import { useState, type CSSProperties, type ReactElement, type RefObject } from 'react';
+
+import type { Track } from '../api/types';
+
+export interface SelectionAnimation {
+  id: number;
+  track: Track;
+  from: DOMRect;
+  to: DOMRect;
+}
+
+interface ImageContainerProps {
+  selectedTrack?: Track;
+  animation?: SelectionAnimation;
+  targetRef: RefObject<HTMLDivElement | null>;
+  onAnimationComplete(track: Track): void;
+}
+
+type FlyerStyle = CSSProperties &
+  Record<
+    | '--flyer-from-x'
+    | '--flyer-from-y'
+    | '--flyer-from-width'
+    | '--flyer-from-height'
+    | '--flyer-to-x'
+    | '--flyer-to-y'
+    | '--flyer-to-width'
+    | '--flyer-to-height',
+    string
+  >;
+
+export function ImageContainer({
+  selectedTrack,
+  animation,
+  targetRef,
+  onAnimationComplete,
+}: ImageContainerProps): ReactElement {
+  const [playerVisible, setPlayerVisible] = useState(false);
+  const hasImage = Boolean(selectedTrack?.imageUrl);
+  const flyerStyle: FlyerStyle | undefined = animation
+    ? {
+        '--flyer-from-x': `${animation.from.left}px`,
+        '--flyer-from-y': `${animation.from.top}px`,
+        '--flyer-from-width': `${animation.from.width}px`,
+        '--flyer-from-height': `${animation.from.height}px`,
+        '--flyer-to-x': `${animation.to.left}px`,
+        '--flyer-to-y': `${animation.to.top}px`,
+        '--flyer-to-width': `${animation.to.width}px`,
+        '--flyer-to-height': `${animation.to.height}px`,
+      }
+    : undefined;
+
+  return (
+    <section className="image-container" aria-labelledby="selected-track-heading">
+      <h2 id="selected-track-heading">Selected track</h2>
+      <button
+        type="button"
+        className={`selected-track ${selectedTrack ? 'selected-track-ready' : ''}`}
+        onClick={() => setPlayerVisible((visible) => (selectedTrack ? !visible : false))}
+        disabled={!selectedTrack}
+        aria-label={selectedTrack ? `Play ${selectedTrack.title}` : 'No track selected'}
+      >
+        <div ref={targetRef} className="selected-track-target">
+          {selectedTrack ? (
+            hasImage ? (
+              <img key={selectedTrack.id} src={selectedTrack.imageUrl} alt="" className="selected-image" />
+            ) : (
+              <span className="selected-placeholder">{selectedTrack.title}</span>
+            )
+          ) : (
+            <span className="selected-placeholder">Choose a result</span>
+          )}
+        </div>
+      </button>
+
+      {animation ? (
+        <div
+          key={animation.id}
+          className="selection-flyer"
+          style={flyerStyle}
+          onAnimationEnd={() => {
+            onAnimationComplete(animation.track);
+            setPlayerVisible(false);
+          }}
+          aria-hidden="true"
+        >
+          {animation.track.title}
+        </div>
+      ) : null}
+
+      {selectedTrack && playerVisible ? (
+        <iframe
+          className="track-player"
+          title={`Mixcloud player for ${selectedTrack.title}`}
+          src={selectedTrack.embedUrl}
+          allow="autoplay"
+        />
+      ) : null}
+    </section>
+  );
+}

@@ -4,7 +4,7 @@ import type { Track } from '../api/types';
 
 interface ResultsListProps {
   tracks: Track[];
-  onSelectTrack(track: Track): void;
+  onSelectTrack(track: Track, sourceElement: HTMLElement): void;
 }
 
 export function ResultsList({ tracks, onSelectTrack }: ResultsListProps): ReactElement | null {
@@ -18,7 +18,11 @@ export function ResultsList({ tracks, onSelectTrack }: ResultsListProps): ReactE
       <ul className="results-list">
         {tracks.map((track) => (
           <li key={track.id} className="result-item">
-            <button type="button" className="result-button" onClick={() => onSelectTrack(track)}>
+            <button
+              type="button"
+              className="result-button"
+              onClick={(event) => onSelectTrack(track, event.currentTarget)}
+            >
               <span className="result-title">{track.title}</span>
             </button>
           </li>

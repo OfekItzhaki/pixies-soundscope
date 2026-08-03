@@ -1,8 +1,10 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ChangeEvent, FormEvent, ReactElement } from 'react';
 
+import type { Track } from '../api/types';
 import { useSearchState } from '../state/useSearchState';
 import { debounce } from '../utils/debounce';
+import { ImageContainer, type SelectionAnimation } from './ImageContainer';
 import { PaginationControls } from './PaginationControls';
 import { ResultsList } from './ResultsList';
 
@@ -10,6 +12,9 @@ const SEARCH_DEBOUNCE_MS = 300;
 
 export function SearchContainer(): ReactElement {
   const { state, actions } = useSearchState();
+  const imageTargetRef = useRef<HTMLDivElement | null>(null);
+  const animationIdRef = useRef(0);
+  const [selectionAnimation, setSelectionAnimation] = useState<SelectionAnimation | undefined>();
   const debouncedSearch = useMemo(
     () =>
       debounce((query: string) => {
@@ -32,6 +37,23 @@ export function SearchContainer(): ReactElement {
     event.preventDefault();
     debouncedSearch.cancel();
     void actions.performSearch(state.query);
+  };
+
+  const handleSelectTrack = (track: Track, sourceElement: HTMLElement): void => {
+    const targetElement = imageTargetRef.current;
+
+    if (!targetElement) {
+      actions.selectTrack(track);
+      return;
+    }
+
+    animationIdRef.current += 1;
+    setSelectionAnimation({
+      id: animationIdRef.current,
+      track,
+      from: sourceElement.getBoundingClientRect(),
+      to: targetElement.getBoundingClientRect(),
+    });
   };
 
   return (
@@ -72,7 +94,17 @@ export function SearchContainer(): ReactElement {
         <p className="status-message">No tracks found for "{state.query}".</p>
       ) : null}
 
-      <ResultsList tracks={state.results} onSelectTrack={actions.selectTrack} />
+      <ImageContainer
+        selectedTrack={state.selectedTrack}
+        animation={selectionAnimation}
+        targetRef={imageTargetRef}
+        onAnimationComplete={(track) => {
+          actions.selectTrack(track);
+          setSelectionAnimation(undefined);
+        }}
+      />
+
+      <ResultsList tracks={state.results} onSelectTrack={handleSelectTrack} />
       <PaginationControls />
     </section>
   );
