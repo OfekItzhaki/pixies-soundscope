@@ -1,9 +1,22 @@
+import { getStringArrayItem, setStringArrayItem, type KeyValueStorage } from '../utils/storage';
+
 export interface SearchHistoryStorage {
   read(): string[];
   write(history: string[]): void;
 }
 
 export const MAX_RECENT_SEARCHES = 5;
+export const SEARCH_HISTORY_STORAGE_KEY = 'pixies-soundscope:recent-searches';
+
+export function createSearchHistoryStorage(
+  storage?: KeyValueStorage,
+  key = SEARCH_HISTORY_STORAGE_KEY,
+): SearchHistoryStorage {
+  return {
+    read: () => getStringArrayItem(key, [], storage),
+    write: (history: string[]) => setStringArrayItem(key, history, storage),
+  };
+}
 
 export function loadHistory(storage: SearchHistoryStorage): string[] {
   return sanitizeHistory(storage.read());
