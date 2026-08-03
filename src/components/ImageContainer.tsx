@@ -15,7 +15,9 @@ interface ImageContainerProps {
   targetRef: RefObject<HTMLDivElement | null>;
   selectedButtonRef: RefObject<HTMLButtonElement | null>;
   playerVisible: boolean;
+  autoplaySelection: boolean;
   onPlayerToggle(): void;
+  onAutoplaySelectionChange(enabled: boolean): void;
   onAnimationComplete(track: Track): void;
 }
 
@@ -38,7 +40,9 @@ export function ImageContainer({
   targetRef,
   selectedButtonRef,
   playerVisible,
+  autoplaySelection,
   onPlayerToggle,
+  onAutoplaySelectionChange,
   onAnimationComplete,
 }: ImageContainerProps): ReactElement {
   const hasImage = Boolean(selectedTrack?.imageUrl);
@@ -59,6 +63,14 @@ export function ImageContainer({
   return (
     <section className="image-container" aria-labelledby="selected-track-heading">
       <h2 id="selected-track-heading">Selected track</h2>
+      <label className="autoplay-toggle">
+        <input
+          type="checkbox"
+          checked={autoplaySelection}
+          onChange={(event) => onAutoplaySelectionChange(event.target.checked)}
+        />
+        <span>Autoplay selected tracks</span>
+      </label>
       <button
         ref={selectedButtonRef}
         type="button"
@@ -121,7 +133,6 @@ function MixcloudPlayer({ track, embedUrl }: MixcloudPlayerProps): ReactElement 
         title={`Mixcloud player for ${track.title}`}
         src={embedUrl}
         allow="autoplay; encrypted-media"
-        loading="lazy"
         aria-label={`Mixcloud embedded player for ${track.title}`}
       />
     </div>

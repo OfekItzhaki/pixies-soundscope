@@ -67,10 +67,10 @@ export function SearchContainer(): ReactElement {
 
   const handleSelectTrack = (track: Track, sourceElement: HTMLElement): void => {
     const targetElement = imageTargetRef.current;
+    actions.selectTrack(track);
+    setVisiblePlayerTrackId(autoplaySelection ? track.id : undefined);
 
     if (!targetElement) {
-      actions.selectTrack(track);
-      setVisiblePlayerTrackId(autoplaySelection ? track.id : undefined);
       return;
     }
 
@@ -110,14 +110,6 @@ export function SearchContainer(): ReactElement {
             Go
           </button>
         </div>
-        <label className="autoplay-toggle">
-          <input
-            type="checkbox"
-            checked={autoplaySelection}
-            onChange={(event) => handleAutoplaySelectionChange(event.target.checked)}
-          />
-          <span>Autoplay selected tracks</span>
-        </label>
       </form>
 
       <div id="search-status" className="status-region" aria-live="polite" aria-atomic="true">
@@ -143,6 +135,7 @@ export function SearchContainer(): ReactElement {
         targetRef={imageTargetRef}
         selectedButtonRef={selectedTrackButtonRef}
         playerVisible={Boolean(state.selectedTrack && visiblePlayerTrackId === state.selectedTrack.id)}
+        autoplaySelection={autoplaySelection}
         onPlayerToggle={() =>
           setVisiblePlayerTrackId((currentTrackId) =>
             state.selectedTrack && currentTrackId !== state.selectedTrack.id
@@ -150,9 +143,9 @@ export function SearchContainer(): ReactElement {
               : undefined,
           )
         }
+        onAutoplaySelectionChange={handleAutoplaySelectionChange}
         onAnimationComplete={(track) => {
           actions.selectTrack(track);
-          setVisiblePlayerTrackId(autoplaySelection ? track.id : undefined);
           setSelectionAnimation(undefined);
           window.requestAnimationFrame(() => selectedTrackButtonRef.current?.focus());
         }}
