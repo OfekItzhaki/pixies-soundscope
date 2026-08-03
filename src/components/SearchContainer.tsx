@@ -62,7 +62,8 @@ export function SearchContainer(): ReactElement {
     event.preventDefault();
     debouncedSearch.cancel();
     debouncedRecentSearch.cancel();
-    void actions.performSearch(state.query, { recordInHistory: true });
+    actions.recordRecentSearch(state.query);
+    void actions.performSearch(state.query);
   };
 
   const handleSelectTrack = (track: Track, sourceElement: HTMLElement): void => {
