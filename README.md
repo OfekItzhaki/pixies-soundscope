@@ -1,7 +1,7 @@
 # PiXies - SoundScope
 
-PiXies – SoundScope is a React + TypeScript web app that lets users explore and play tracks from the Mixcloud sound API. It focuses on clean, testable architecture, robust async behavior (debounce and cancellation),
-and a polished UX with recent searches, cursor-based pagination, and an animated central track view
+PiXies - SoundScope is a React + TypeScript front-end exam project for searching and playing Mixcloud tracks. It uses a layered architecture so Mixcloud-specific data access stays isolated from state/business logic and UI components.
+
 ## Tech Stack
 
 - Vite
