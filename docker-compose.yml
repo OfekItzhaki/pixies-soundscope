@@ -1,0 +1,7 @@
+services:
+  pixies-soundscope:
+    build:
+      context: .
+    image: pixies-soundscope:latest
+    ports:
+      - "4173:4173"
