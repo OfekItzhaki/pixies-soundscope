@@ -31,16 +31,40 @@ describe('ImageContainer', () => {
     vi.restoreAllMocks();
   });
 
-  it('turns a selected-image click into an autoplay iframe request before iframe play is pressed', () => {
+  it('plays through the existing widget without reloading the iframe', async () => {
+    const play = vi.fn().mockResolvedValue(undefined);
+    const togglePlay = vi.fn().mockResolvedValue(undefined);
     const onPlayerToggle = vi.fn();
     const targetRef = { current: null };
     const selectedButtonRef = { current: null };
+    const playListeners: Array<() => void> = [];
+    const pauseListeners: Array<() => void> = [];
+
+    window.Mixcloud = {
+      PlayerWidget: vi.fn(() => ({
+        ready: Promise.resolve(),
+        events: {
+          play: {
+            on: (listener: () => void): void => {
+              playListeners.push(listener);
+            },
+          },
+          pause: {
+            on: (listener: () => void): void => {
+              pauseListeners.push(listener);
+            },
+          },
+        },
+        play,
+        togglePlay,
+      })),
+    };
 
     container = document.createElement('div');
     document.body.append(container);
     root = createRoot(container);
 
-    act(() => {
+    await act(async () => {
       root?.render(
         <ImageContainer
           selectedTrack={selectedTrack}
@@ -54,21 +78,24 @@ describe('ImageContainer', () => {
     });
 
     const iframeBeforeClick = getPlayerIframe();
-    expect(iframeBeforeClick.src).not.toContain('autoplay=1');
+    const iframeSrcBeforeClick = iframeBeforeClick.src;
     expect(iframeBeforeClick.getAttribute('allow')).toContain('autoplay');
 
     const selectedButton = getSelectedTrackButton();
 
-    act(() => {
+    await act(async () => {
       selectedButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
 
     const iframeAfterClick = getPlayerIframe();
-    const iframeUrl = new URL(iframeAfterClick.src);
 
-    expect(iframeUrl.searchParams.get('autoplay')).toBe('1');
-    expect(iframeUrl.searchParams.get('pixies_play_request')).toBe('1');
-    expect(onPlayerToggle).toHaveBeenCalledTimes(1);
+    expect(iframeAfterClick.src).toBe(iframeSrcBeforeClick);
+    expect(iframeAfterClick.src).not.toContain('autoplay=1');
+    expect(play).toHaveBeenCalledTimes(1);
+    expect(togglePlay).not.toHaveBeenCalled();
+    expect(onPlayerToggle).not.toHaveBeenCalled();
+    expect(playListeners).toHaveLength(1);
+    expect(pauseListeners).toHaveLength(1);
   });
 });
 

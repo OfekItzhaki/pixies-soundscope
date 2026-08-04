@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import type { CSSProperties, ReactElement, RefObject } from 'react';
 
 import type { Track } from '../api/types';
@@ -46,7 +46,6 @@ export function ImageContainer({
   const playerHasStartedRef = useRef(false);
   const playerIsPlayingRef = useRef(false);
   const pendingPlayRequestRef = useRef(false);
-  const [playRequest, setPlayRequest] = useState({ id: 0, trackId: '' });
   const hasImage = Boolean(selectedTrack?.imageUrl);
   const flyerStyle: FlyerStyle | undefined = animation
     ? {
@@ -82,19 +81,11 @@ export function ImageContainer({
       }
 
       pendingPlayRequestRef.current = true;
-      setPlayRequest((currentRequest) => ({
-        id: currentRequest.id + 1,
-        trackId: selectedTrack.id,
-      }));
-      void playerWidget.play();
+      void requestWidgetPlay(playerWidget, pendingPlayRequestRef);
       return;
     }
 
     pendingPlayRequestRef.current = true;
-    setPlayRequest((currentRequest) => ({
-      id: currentRequest.id + 1,
-      trackId: selectedTrack.id,
-    }));
     onPlayerToggle();
   };
 
@@ -148,7 +139,6 @@ export function ImageContainer({
           key={selectedTrack.id}
           track={selectedTrack}
           embedUrl={selectedTrack.embedUrl}
-          playRequestId={playRequest.trackId === selectedTrack.id ? playRequest.id : 0}
           onReady={(widget) => {
             playerWidgetRef.current = widget;
             widget.events.play.on(() => {
@@ -160,8 +150,7 @@ export function ImageContainer({
             });
 
             if (pendingPlayRequestRef.current) {
-              pendingPlayRequestRef.current = false;
-              void widget.play();
+              void requestWidgetPlay(widget, pendingPlayRequestRef);
             }
           }}
         />
@@ -173,7 +162,6 @@ export function ImageContainer({
 interface MixcloudPlayerProps {
   track: Track;
   embedUrl: string;
-  playRequestId: number;
   onReady(widget: MixcloudPlayerWidget): void;
 }
 
@@ -195,6 +183,20 @@ interface MixcloudWidgetApi {
   PlayerWidget(iframe: HTMLIFrameElement): MixcloudPlayerWidget;
 }
 
+function requestWidgetPlay(
+  widget: MixcloudPlayerWidget,
+  pendingPlayRequestRef: RefObject<boolean>,
+): void {
+  widget
+    .play()
+    .then(() => {
+      pendingPlayRequestRef.current = false;
+    })
+    .catch(() => {
+      pendingPlayRequestRef.current = false;
+    });
+}
+
 declare global {
   interface Window {
     Mixcloud?: MixcloudWidgetApi;
@@ -203,24 +205,18 @@ declare global {
 
 let mixcloudWidgetApiPromise: Promise<MixcloudWidgetApi> | undefined;
 
-function MixcloudPlayer({
-  track,
-  embedUrl,
-  playRequestId,
-  onReady,
-}: MixcloudPlayerProps): ReactElement {
+function MixcloudPlayer({ track, embedUrl, onReady }: MixcloudPlayerProps): ReactElement {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const initializedEmbedUrlRef = useRef<string | undefined>(undefined);
-  const playableEmbedUrl = buildPlayableEmbedUrl(embedUrl, playRequestId);
 
   const initializeWidget = useCallback((): void => {
     const iframe = iframeRef.current;
 
-    if (!iframe || initializedEmbedUrlRef.current === playableEmbedUrl) {
+    if (!iframe || initializedEmbedUrlRef.current === embedUrl) {
       return;
     }
 
-    initializedEmbedUrlRef.current = playableEmbedUrl;
+    initializedEmbedUrlRef.current = embedUrl;
 
     void loadMixcloudWidgetApi()
       .then((mixcloudApi) => {
@@ -234,7 +230,7 @@ function MixcloudPlayer({
         initializedEmbedUrlRef.current = undefined;
         // The iframe remains usable even if the optional widget API fails to load.
       });
-  }, [onReady, playableEmbedUrl]);
+  }, [embedUrl, onReady]);
 
   useEffect(() => {
     initializeWidget();
@@ -246,25 +242,13 @@ function MixcloudPlayer({
         ref={iframeRef}
         className="track-player"
         title={`Mixcloud player for ${track.title}`}
-        src={playableEmbedUrl}
+        src={embedUrl}
         allow="autoplay; encrypted-media"
         aria-label={`Mixcloud embedded player for ${track.title}`}
         onLoad={initializeWidget}
       />
     </div>
   );
-}
-
-function buildPlayableEmbedUrl(embedUrl: string, playRequestId: number): string {
-  if (playRequestId === 0) {
-    return embedUrl;
-  }
-
-  const playableEmbedUrl = new URL(embedUrl);
-  playableEmbedUrl.searchParams.set('autoplay', '1');
-  playableEmbedUrl.searchParams.set('pixies_play_request', String(playRequestId));
-
-  return playableEmbedUrl.toString();
 }
 
 function loadMixcloudWidgetApi(): Promise<MixcloudWidgetApi> {

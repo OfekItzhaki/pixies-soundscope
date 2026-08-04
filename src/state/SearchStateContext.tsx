@@ -29,7 +29,7 @@ import type {
 } from './types';
 import { getStringItem, setStringItem, type KeyValueStorage } from '../utils/storage';
 
-const VIEW_MODE_STORAGE_KEY = 'pixies-soundscope:view-mode';
+const VIEW_MODE_STORAGE_KEY = 'pixies-soundscope:view-mode:v2';
 
 const defaultSoundApiClient = createSoundApiClient();
 const defaultSearchHistoryStorage = createSearchHistoryStorage();
