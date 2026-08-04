@@ -16,9 +16,7 @@ interface ImageContainerProps {
   targetRef: RefObject<HTMLDivElement | null>;
   selectedButtonRef: RefObject<HTMLButtonElement | null>;
   playerVisible: boolean;
-  autoplaySelection: boolean;
   onPlayerToggle(): void;
-  onAutoplaySelectionChange(enabled: boolean): void;
   onAnimationComplete(track: Track): void;
 }
 
@@ -41,15 +39,12 @@ export function ImageContainer({
   targetRef,
   selectedButtonRef,
   playerVisible,
-  autoplaySelection,
   onPlayerToggle,
-  onAutoplaySelectionChange,
   onAnimationComplete,
 }: ImageContainerProps): ReactElement {
   const playerWidgetRef = useRef<MixcloudPlayerWidget | null>(null);
   const playerStartedRef = useRef(false);
   const hasImage = Boolean(selectedTrack?.imageUrl);
-  const playableEmbedUrl = selectedTrack ? buildPlayableEmbedUrl(selectedTrack.embedUrl) : undefined;
   const flyerStyle: FlyerStyle | undefined = animation
     ? {
         '--flyer-from-x': `${animation.from.left}px`,
@@ -91,14 +86,6 @@ export function ImageContainer({
   return (
     <section className="image-container" aria-labelledby="selected-track-heading">
       <h2 id="selected-track-heading">Selected track</h2>
-      <label className="autoplay-toggle">
-        <input
-          type="checkbox"
-          checked={autoplaySelection}
-          onChange={(event) => onAutoplaySelectionChange(event.target.checked)}
-        />
-        <span>Autoplay selected tracks</span>
-      </label>
       <button
         ref={selectedButtonRef}
         type="button"
@@ -141,12 +128,11 @@ export function ImageContainer({
         </div>
       ) : null}
 
-      {selectedTrack && playerVisible && playableEmbedUrl ? (
+      {selectedTrack && playerVisible ? (
         <MixcloudPlayer
           key={selectedTrack.id}
           track={selectedTrack}
-          embedUrl={playableEmbedUrl}
-          shouldStartPlaying={autoplaySelection}
+          embedUrl={selectedTrack.embedUrl}
           onReady={(widget) => {
             playerWidgetRef.current = widget;
             widget.events.play.on(() => {
@@ -162,7 +148,6 @@ export function ImageContainer({
 interface MixcloudPlayerProps {
   track: Track;
   embedUrl: string;
-  shouldStartPlaying: boolean;
   onReady(widget: MixcloudPlayerWidget): void;
 }
 
@@ -191,12 +176,7 @@ declare global {
 
 let mixcloudWidgetApiPromise: Promise<MixcloudWidgetApi> | undefined;
 
-function MixcloudPlayer({
-  track,
-  embedUrl,
-  shouldStartPlaying,
-  onReady,
-}: MixcloudPlayerProps): ReactElement {
+function MixcloudPlayer({ track, embedUrl, onReady }: MixcloudPlayerProps): ReactElement {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const initializedEmbedUrlRef = useRef<string | undefined>(undefined);
 
@@ -215,17 +195,13 @@ function MixcloudPlayer({
 
         return widget.ready.then(() => {
           onReady(widget);
-
-          if (shouldStartPlaying) {
-            void widget.play();
-          }
         });
       })
       .catch(() => {
         initializedEmbedUrlRef.current = undefined;
         // The iframe remains usable even if the optional widget API fails to load.
       });
-  }, [embedUrl, onReady, shouldStartPlaying]);
+  }, [embedUrl, onReady]);
 
   useEffect(() => {
     initializeWidget();
@@ -238,7 +214,7 @@ function MixcloudPlayer({
         className="track-player"
         title={`Mixcloud player for ${track.title}`}
         src={embedUrl}
-        allow="autoplay; encrypted-media"
+        allow="encrypted-media"
         aria-label={`Mixcloud embedded player for ${track.title}`}
         onLoad={initializeWidget}
       />
@@ -292,11 +268,4 @@ function loadMixcloudWidgetApi(): Promise<MixcloudWidgetApi> {
   });
 
   return mixcloudWidgetApiPromise;
-}
-
-function buildPlayableEmbedUrl(embedUrl: string): string {
-  const playableEmbedUrl = new URL(embedUrl);
-  playableEmbedUrl.searchParams.set('autoplay', '1');
-
-  return playableEmbedUrl.toString();
 }

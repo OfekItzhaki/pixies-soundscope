@@ -4,14 +4,12 @@ import type { ChangeEvent, FocusEvent, FormEvent, ReactElement } from 'react';
 import type { Track } from '../api/types';
 import { useSearchState } from '../state/useSearchState';
 import { debounce } from '../utils/debounce';
-import { getStringItem, setStringItem } from '../utils/storage';
 import { ImageContainer, type SelectionAnimation } from './ImageContainer';
 import { PaginationControls } from './PaginationControls';
 import { ResultsGrid } from './ResultsGrid';
 import { ResultsList } from './ResultsList';
 
 const SEARCH_DEBOUNCE_MS = 300;
-const AUTOPLAY_SELECTION_STORAGE_KEY = 'pixies-soundscope:autoplay-selection';
 
 export function SearchContainer(): ReactElement {
   const { state, actions } = useSearchState();
@@ -21,9 +19,6 @@ export function SearchContainer(): ReactElement {
   const [selectionAnimation, setSelectionAnimation] = useState<SelectionAnimation | undefined>();
   const [visiblePlayerTrackId, setVisiblePlayerTrackId] = useState<string | undefined>();
   const [recentSearchesOpen, setRecentSearchesOpen] = useState(false);
-  const [autoplaySelection, setAutoplaySelection] = useState<boolean>(
-    () => getStringItem(AUTOPLAY_SELECTION_STORAGE_KEY, 'enabled') !== 'disabled',
-  );
   const hasCompletedEmptySearch =
     !state.loading &&
     !state.error &&
@@ -77,7 +72,6 @@ export function SearchContainer(): ReactElement {
 
     if (!targetElement) {
       actions.selectTrack(track);
-      setVisiblePlayerTrackId(autoplaySelection ? track.id : undefined);
       return;
     }
 
@@ -88,11 +82,6 @@ export function SearchContainer(): ReactElement {
       from: sourceElement.getBoundingClientRect(),
       to: targetElement.getBoundingClientRect(),
     });
-  };
-
-  const handleAutoplaySelectionChange = (enabled: boolean): void => {
-    setAutoplaySelection(enabled);
-    setStringItem(AUTOPLAY_SELECTION_STORAGE_KEY, enabled ? 'enabled' : 'disabled');
   };
 
   const hasRecentSearches = state.recentSearches.length > 0;
@@ -199,7 +188,6 @@ export function SearchContainer(): ReactElement {
         targetRef={imageTargetRef}
         selectedButtonRef={selectedTrackButtonRef}
         playerVisible={Boolean(state.selectedTrack && visiblePlayerTrackId === state.selectedTrack.id)}
-        autoplaySelection={autoplaySelection}
         onPlayerToggle={() =>
           setVisiblePlayerTrackId((currentTrackId) => {
             if (!state.selectedTrack || currentTrackId === state.selectedTrack.id) {
@@ -209,10 +197,8 @@ export function SearchContainer(): ReactElement {
             return state.selectedTrack.id;
           })
         }
-        onAutoplaySelectionChange={handleAutoplaySelectionChange}
         onAnimationComplete={(track) => {
           actions.selectTrack(track);
-          setVisiblePlayerTrackId(autoplaySelection ? track.id : undefined);
           setSelectionAnimation(undefined);
           window.requestAnimationFrame(() => selectedTrackButtonRef.current?.focus());
         }}
