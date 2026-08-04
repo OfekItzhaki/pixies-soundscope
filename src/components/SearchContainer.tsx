@@ -10,8 +10,7 @@ import { PaginationControls } from './PaginationControls';
 import { ResultsGrid } from './ResultsGrid';
 import { ResultsList } from './ResultsList';
 
-const SEARCH_DEBOUNCE_MS = 2000;
-const RECENT_SEARCH_STABILITY_MS = 5000;
+const SEARCH_DEBOUNCE_MS = 300;
 const AUTOPLAY_SELECTION_STORAGE_KEY = 'pixies-soundscope:autoplay-selection';
 
 export function SearchContainer(): ReactElement {
@@ -33,37 +32,27 @@ export function SearchContainer(): ReactElement {
   const debouncedSearch = useMemo(
     () =>
       debounce((query: string) => {
-        void actions.performSearch(query);
+        void actions.performSearch(query, { recordInHistory: true });
       }, SEARCH_DEBOUNCE_MS),
-    [actions],
-  );
-  const debouncedRecentSearch = useMemo(
-    () =>
-      debounce((query: string) => {
-        actions.recordRecentSearch(query);
-      }, RECENT_SEARCH_STABILITY_MS),
     [actions],
   );
 
   useEffect(() => {
     return () => {
       debouncedSearch.cancel();
-      debouncedRecentSearch.cancel();
     };
-  }, [debouncedRecentSearch, debouncedSearch]);
+  }, [debouncedSearch]);
 
   const handleQueryChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const nextQuery = event.target.value;
     actions.setQuery(nextQuery);
     debouncedSearch(nextQuery);
-    debouncedRecentSearch(nextQuery);
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     setRecentSearchesOpen(false);
     debouncedSearch.cancel();
-    debouncedRecentSearch.cancel();
     actions.recordRecentSearch(state.query);
     void actions.performSearch(state.query);
   };
@@ -71,7 +60,6 @@ export function SearchContainer(): ReactElement {
   const handleRecentSearchSelect = (term: string): void => {
     setRecentSearchesOpen(false);
     debouncedSearch.cancel();
-    debouncedRecentSearch.cancel();
     actions.setQuery(term);
     void actions.performSearch(term, { recordInHistory: true });
   };
@@ -86,10 +74,10 @@ export function SearchContainer(): ReactElement {
 
   const handleSelectTrack = (track: Track, sourceElement: HTMLElement): void => {
     const targetElement = imageTargetRef.current;
-    actions.selectTrack(track);
-    setVisiblePlayerTrackId(autoplaySelection ? track.id : undefined);
 
     if (!targetElement) {
+      actions.selectTrack(track);
+      setVisiblePlayerTrackId(autoplaySelection ? track.id : undefined);
       return;
     }
 
@@ -137,7 +125,6 @@ export function SearchContainer(): ReactElement {
                 onClick={() => {
                   actions.setQuery('');
                   debouncedSearch.cancel();
-                  debouncedRecentSearch.cancel();
                 }}
               >
                 <span aria-hidden="true" className="icon-x" />
@@ -225,6 +212,7 @@ export function SearchContainer(): ReactElement {
         onAutoplaySelectionChange={handleAutoplaySelectionChange}
         onAnimationComplete={(track) => {
           actions.selectTrack(track);
+          setVisiblePlayerTrackId(autoplaySelection ? track.id : undefined);
           setSelectionAnimation(undefined);
           window.requestAnimationFrame(() => selectedTrackButtonRef.current?.focus());
         }}

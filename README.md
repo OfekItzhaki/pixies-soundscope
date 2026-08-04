@@ -87,7 +87,7 @@ Then open `http://localhost:4173`.
 
 - Searches Mixcloud cloudcasts through the data layer.
 - Displays results 6 at a time using Mixcloud cursor URLs for Next and Previous pagination.
-- Stores the last 5 recent searches in `localStorage`, de-duplicated and ordered by recency. Typed searches are recorded after the input stays unchanged for 5 seconds, while Go/Enter records immediately.
+- Stores the last 5 recent searches in `localStorage`, de-duplicated and ordered by recency. Debounced typed searches and Go/Enter searches are recorded as searches.
 - Supports list and tile result views, with the selected view persisted across visits.
 - Shows a central selected-track image with a simple result-to-image animation.
 - Embeds the selected track with the Mixcloud iframe widget. Selected tracks request autoplay by default, and the autoplay preference is persisted across visits. Browser autoplay policy may still require a user click.
@@ -120,7 +120,7 @@ The UI never calls Mixcloud directly. Components dispatch actions through the se
 
 Recent searches and pagination are pure TypeScript modules. They are easy to test without React, browser rendering, or network access.
 
-Search requests use `AbortController` and a request id guard. This prevents stale responses from replacing newer results during rapid typing or pagination.
+Search requests are debounced at 300ms and use `AbortController` plus a request id guard. This prevents stale responses from replacing newer results during rapid typing or pagination.
 
 ## Documentation
 
