@@ -2,6 +2,6 @@ services:
   pixies-soundscope:
     build:
       context: .
-    image: pixies-soundscope:latest
+    image: pixies-soundscope:node24-lts
     ports:
       - "4173:4173"
