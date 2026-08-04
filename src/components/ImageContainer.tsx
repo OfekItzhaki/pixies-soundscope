@@ -43,7 +43,9 @@ export function ImageContainer({
   onAnimationComplete,
 }: ImageContainerProps): ReactElement {
   const playerWidgetRef = useRef<MixcloudPlayerWidget | null>(null);
-  const playerStartedRef = useRef(false);
+  const playerHasStartedRef = useRef(false);
+  const playerIsPlayingRef = useRef(false);
+  const pendingPlayRequestRef = useRef(false);
   const hasImage = Boolean(selectedTrack?.imageUrl);
   const flyerStyle: FlyerStyle | undefined = animation
     ? {
@@ -60,7 +62,9 @@ export function ImageContainer({
 
   useEffect(() => {
     playerWidgetRef.current = null;
-    playerStartedRef.current = false;
+    playerHasStartedRef.current = false;
+    playerIsPlayingRef.current = false;
+    pendingPlayRequestRef.current = false;
   }, [playerVisible, selectedTrack?.id]);
 
   const handleSelectedTrackClick = (): void => {
@@ -71,7 +75,7 @@ export function ImageContainer({
     const playerWidget = playerWidgetRef.current;
 
     if (playerVisible && playerWidget) {
-      if (playerStartedRef.current) {
+      if (playerHasStartedRef.current && playerIsPlayingRef.current) {
         void playerWidget.togglePlay();
         return;
       }
@@ -80,6 +84,7 @@ export function ImageContainer({
       return;
     }
 
+    pendingPlayRequestRef.current = true;
     onPlayerToggle();
   };
 
@@ -136,8 +141,17 @@ export function ImageContainer({
           onReady={(widget) => {
             playerWidgetRef.current = widget;
             widget.events.play.on(() => {
-              playerStartedRef.current = true;
+              playerHasStartedRef.current = true;
+              playerIsPlayingRef.current = true;
             });
+            widget.events.pause?.on(() => {
+              playerIsPlayingRef.current = false;
+            });
+
+            if (pendingPlayRequestRef.current) {
+              pendingPlayRequestRef.current = false;
+              void widget.play();
+            }
           }}
         />
       ) : null}
@@ -155,6 +169,7 @@ interface MixcloudPlayerWidget {
   readonly ready: Promise<void>;
   readonly events: {
     readonly play: MixcloudWidgetEvent;
+    readonly pause?: MixcloudWidgetEvent;
   };
   play(): Promise<void>;
   togglePlay(): Promise<void>;

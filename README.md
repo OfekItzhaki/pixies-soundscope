@@ -90,7 +90,7 @@ Then open `http://localhost:4173`.
 - Stores the last 5 recent searches in `localStorage`, de-duplicated and ordered by recency. Debounced typed searches and Go/Enter searches are recorded as searches.
 - Supports list and tile result views, with the selected view persisted across visits.
 - Shows a central selected-track image with a simple result-to-image animation.
-- Embeds the selected track with the Mixcloud iframe widget after the user opens the selected-track player.
+- Opens the Mixcloud iframe widget when a track is selected, with selected-art clicks routed to the widget play/pause controls when available.
 - Handles debounced search input, in-flight request cancellation, stale-response protection, loading, empty, and error states.
 - Provides keyboard-friendly controls, semantic regions, ARIA labels, live status messages, and focus management after selection.
 - Includes Vitest unit tests for core search history and pagination logic.

@@ -72,6 +72,7 @@ export function SearchContainer(): ReactElement {
 
     if (!targetElement) {
       actions.selectTrack(track);
+      setVisiblePlayerTrackId(track.id);
       return;
     }
 
@@ -199,6 +200,7 @@ export function SearchContainer(): ReactElement {
         }
         onAnimationComplete={(track) => {
           actions.selectTrack(track);
+          setVisiblePlayerTrackId(track.id);
           setSelectionAnimation(undefined);
           window.requestAnimationFrame(() => selectedTrackButtonRef.current?.focus());
         }}
